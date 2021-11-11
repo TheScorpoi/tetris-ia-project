@@ -34,3 +34,9 @@ python -m pygame.examples.aliens
 # Tested on:
 - OSX Big Sur 11.6
 
+
+## Commands to update from the main repository
+git remote add upstream https://github.com/dgomes/ia-tetris
+git fetch upstream
+git merge upstream/main --allow-unrelated-histories
+
