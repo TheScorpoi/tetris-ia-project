@@ -68,10 +68,16 @@ class SearchNode:
             self.depth = 0
         else:
             self.depth = self.parent.depth + 1
+    
     def __str__(self):
         return "no(" + str(self.state) + "," + str(self.parent) + ")"
     def __repr__(self):
         return str(self)
+    
+    def in_parent(self,state):
+		if self.parent == None:
+			return False
+		return self.state == state or self.parent.in_parent(state)
 
 # Arvores de pesquisa
 class SearchTree:
@@ -133,10 +139,4 @@ class SearchTree:
         elif self.strategy == 'a*':
             self.open_nodes = sorted(self.open_nodes + lnewnodes, key=lambda node: node.heuristic + node.cost)
 
-    #verificar se node já foi pai no caminho que estamos a verificar
-    def inParent(self,node):
-        states = self.get_path(node)
-        lastState = states.pop(-1)
-        if lastState in states:
-            return True
-        return False
+    
