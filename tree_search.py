@@ -10,16 +10,12 @@ class SearchDomain(ABC):
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
     @abstractmethod
-    def result(self, state, action, positions):
+    def result(self, action, positions):
         pass
 
     # custo de uma accao num estado
     @abstractmethod
     def cost(self, state, action):
-        pass
-    
-    @abstractmethod
-    def get_current_position(self):
         pass
     
     # custo estimado de chegar de um estado a outro
@@ -29,26 +25,26 @@ class SearchDomain(ABC):
 
     # test if the given "goal" is satisfied in "state"
     @abstractmethod
-    def satisfies(self, state):
+    def satisfies(self, positions):
         pass
 
 
 # Problemas concretos a resolver
 # dentro de um determinado dominio
 class SearchProblem:
-    def __init__(self, domain, initial):
+    def __init__(self, domain, positions_initial):
         self.domain = domain
-        self.initial = initial #achamos que o initial é a primeira peça a cair aqui de queixos
-        self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
+        self.positions_initial = positions_initial
+        #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
+        self.actions = ['a']
 
-    def goal_test(self, state):
-        return self.domain.satisfies(state)
+    def goal_test(self, positions):
+        return self.domain.satisfies(positions)
 
 # Nos de uma arvore de pesquisa
 class SearchNode:
-    def __init__(self, state, parent, positions): 
+    def __init__(self, parent, positions): 
         self.parent = parent
-        self.state = state
         self.positions = positions 
         self.final = False
         self.cost = 0 
@@ -59,7 +55,7 @@ class SearchNode:
             self.depth = self.parent.depth + 1
 
     def __str__(self):
-        return "no(" + str(self.state) + "," + str(self.parent) + ")"
+        return "no(" + "," + str(self.parent) + ")"
     
     def __repr__(self):
         return str(self)
@@ -70,9 +66,9 @@ class SearchTree:
     # construtor
     def __init__(self,problem, strategy='breadth'): 
         self.problem = problem
-        root = SearchNode(problem.initial, None)
-        root.heuristic = self.problem.domain.heuristic(root.state, self.problem.goal)
-        self.open_nodes = [root]
+        root = SearchNode(None, problem.positions_initial)
+        #root.heuristic = self.problem.domain.heuristic(root.state, self.problem.goal)
+        self.open_nodes = [('', root)]
         self.strategy = strategy
         self.solution = None
         self.length = 0
@@ -80,34 +76,36 @@ class SearchTree:
         self.cost = 0
         
 
-    # obter o caminho (sequencia de estados) da raiz ate um no
+    # obter o caminho da raiz ate um no
     def get_path(self,node):
         if node.parent == None:
-            return [node.state]
+            return [node]
         path = self.get_path(node.parent)
-        path += [node.state]
+        path += [node]
         return(path)
 
     # procurar a solucao
     def search(self, limit = math.inf):
         while self.open_nodes != []:
-            node = self.open_nodes.pop(0)
-            if self.problem.goal_test(node.state):
+            node = self.open_nodes[0][1]
+            action = self.open_nodes.pop(0)[0]
+            if self.problem.goal_test(node.positions):
                 self.solution = node
                 self.length = len(self.get_path(node)) - 1
                 self.terminals = len(self.open_nodes) + 1
-                self.avg_branching = round((self.terminals+self.non_terminals-1)/self.non_terminals, 2)
+                #self.avg_branching = round((self.terminals+self.non_terminals-1)/self.non_terminals, 2)
                 self.cost = node.cost
-                return self.get_path(node)
+                return action
             lnewnodes = []
             self.non_terminals+=1
             for action in self.problem.actions:
-                newstate, new_positions = self.problem.domain.result(node.state, action, node.positions)
-                newnode = SearchNode(newstate,node, new_positions)
-                if (not self.inParent(newnode)) and node.depth < limit:
-                    newnode.cost = node.cost + self.problem.domain.cost(node.state, (node.state, newstate))
-                    newnode.heuristic = self.problem.domain.heuristic(newnode.state, self.problem.goal)
-                    lnewnodes.append(newnode)
+                new_positions = self.problem.domain.result(node.state, action, node.positions)
+                if new_positions != []:
+                    newnode = SearchNode(node, new_positions)
+                    if (not self.inParent(newnode)) and node.depth < limit:
+                        #newnode.cost = node.cost + self.problem.domain.cost(node.state, (node.state, newstate))
+                        #newnode.heuristic = self.problem.domain.heuristic(newnode.state, self.problem.goal)
+                        lnewnodes.append((action,newnode))
             self.add_to_open(lnewnodes)
         return None
 
@@ -126,8 +124,8 @@ class SearchTree:
 
     #verificar se node já foi pai no caminho que estamos a verificar
     def inParent(self,node):
-        states = self.get_path(node)
-        lastState = states.pop(-1)
-        if lastState in states:
+        nos = self.get_path(node)
+        lastNo = nos.pop(-1)
+        if lastNo in nos:
             return True
         return False
