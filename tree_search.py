@@ -1,19 +1,6 @@
-
-# Module: tree_search
-# 
-# This module provides a set o classes for automated
-# problem solving through tree search:
-#    SearchDomain  - problem domains
-#    SearchProblem - concrete problems to be solved
-#    SearchNode    - search tree nodes
-#    SearchTree    - search tree with the necessary methods for searhing
-
 from abc import ABC, abstractmethod
 import math
 
-# Dominios de pesquisa
-# Permitem calcular
-# as accoes possiveis em cada estado, etc
 class SearchDomain(ABC):
 
     # construtor
@@ -21,21 +8,20 @@ class SearchDomain(ABC):
     def __init__(self):
         pass
 
-    # lista de accoes possiveis num estado
-    @abstractmethod
-    def actions(self, state):
-        pass
-
     # resultado de uma accao num estado, ou seja, o estado seguinte
     @abstractmethod
-    def result(self, state, action):
+    def result(self, state, action, positions):
         pass
 
     # custo de uma accao num estado
     @abstractmethod
     def cost(self, state, action):
         pass
-
+    
+    @abstractmethod
+    def get_current_position(self):
+        pass
+    
     # custo estimado de chegar de um estado a outro
     @abstractmethod
     def heuristic(self, state, goal):
@@ -43,42 +29,41 @@ class SearchDomain(ABC):
 
     # test if the given "goal" is satisfied in "state"
     @abstractmethod
-    def satisfies(self, state, goal):
+    def satisfies(self, state):
         pass
 
 
 # Problemas concretos a resolver
 # dentro de um determinado dominio
 class SearchProblem:
-    def __init__(self, domain, initial, goal):
+    def __init__(self, domain, initial):
         self.domain = domain
-        self.initial = initial
-        self.goal = goal
+        self.initial = initial #achamos que o initial é a primeira peça a cair aqui de queixos
+        self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
+
     def goal_test(self, state):
-        return self.domain.satisfies(state,self.goal)
+        return self.domain.satisfies(state)
 
 # Nos de uma arvore de pesquisa
 class SearchNode:
-    def __init__(self,state,parent): 
-        self.state = state  
+    def __init__(self, state, parent, positions): 
         self.parent = parent
+        self.state = state
+        self.positions = positions 
+        self.final = False
         self.cost = 0 
         self.heuristic = 0
         if parent == None:
             self.depth = 0
         else:
             self.depth = self.parent.depth + 1
-    
+
     def __str__(self):
         return "no(" + str(self.state) + "," + str(self.parent) + ")"
+    
     def __repr__(self):
         return str(self)
     
-    def in_parent(self,state):
-		if self.parent == None:
-			return False
-		return self.state == state or self.parent.in_parent(state)
-
 # Arvores de pesquisa
 class SearchTree:
 
@@ -93,7 +78,7 @@ class SearchTree:
         self.length = 0
         self.non_terminals = 0
         self.cost = 0
-
+        
 
     # obter o caminho (sequencia de estados) da raiz ate um no
     def get_path(self,node):
@@ -116,9 +101,9 @@ class SearchTree:
                 return self.get_path(node)
             lnewnodes = []
             self.non_terminals+=1
-            for a in self.problem.domain.actions(node.state):
-                newstate = self.problem.domain.result(node.state,a)
-                newnode = SearchNode(newstate,node)
+            for action in self.problem.actions:
+                newstate, new_positions = self.problem.domain.result(node.state, action, node.positions)
+                newnode = SearchNode(newstate,node, new_positions)
                 if (not self.inParent(newnode)) and node.depth < limit:
                     newnode.cost = node.cost + self.problem.domain.cost(node.state, (node.state, newstate))
                     newnode.heuristic = self.problem.domain.heuristic(newnode.state, self.problem.goal)
@@ -139,4 +124,10 @@ class SearchTree:
         elif self.strategy == 'a*':
             self.open_nodes = sorted(self.open_nodes + lnewnodes, key=lambda node: node.heuristic + node.cost)
 
-    
+    #verificar se node já foi pai no caminho que estamos a verificar
+    def inParent(self,node):
+        states = self.get_path(node)
+        lastState = states.pop(-1)
+        if lastState in states:
+            return True
+        return False

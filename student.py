@@ -13,6 +13,29 @@
 from tree_search import *
 import math
 
+
+class Student(SearchDomain):
+    def __init__(self):
+        pass
+    
+    def result(self, state, action, positions):
+        
+        if action == 'left':
+            position_x -= 1
+        elif action == 'right':
+            position_x += 1
+        elif action == 'down':
+            position_y += 1
+        elif action == 'drop':
+            pass
+        elif action == 'turn_right': 
+            pass                             
+        elif action == 'turn_left':
+            pass
+        
+        return state, position_x, position_y
+    
+
 class Cidades(SearchDomain):
     def __init__(self,connections, coordinates):
         self.connections = connections
