@@ -1,0 +1,6 @@
+Anotações sobre o jogo:
+
+Quando se coloca uma peça nova no jogo ela é colocada no y=2
+Quando a peça é colocada, no array game sao colocadas as informações da posição em q ela ficou
+piece é onde a peça esta naquele momento no viewer
+
