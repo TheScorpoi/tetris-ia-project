@@ -28,13 +28,11 @@ class Student(SearchDomain):
         
         if action == 'a':
             return self.translate(-1,0,positions) 
-        elif action == 'right':
+        elif action == 'd':
+            return self.translate(1,0,positions) 
+        elif action == 's':
             pass
-        elif action == 'down':
-            pass
-        elif action == 'drop':
-            pass
-        elif action == 'rotate': 
+        elif action == 'w': 
             pass
                                      
     def satisfies(self, positions):
@@ -48,6 +46,26 @@ class Student(SearchDomain):
             return [ (cx + x , cy + y ) for cx, cy in positions]
         return []
 
+    '''
+    def set_pos(self, x, y):
+        x = int(x)
+        y = int(y)
+        self.positions = [
+            (cx + x - self._x, cy + y - self._y) for cx, cy in self.positions
+        ]
+        self._x = x
+        self._y = y
+
+    def rotate(self, step=1):
+        rotation = (rotation + step) % len(self.plan)
+        self.positions = [
+            (self._x + x, self._y + y)
+            for y, line in enumerate(self.plan[self.rotation])
+            for x, pos in enumerate(line)
+            if pos == "1"
+        ]
+    '''
+    
     def cost(self, state, action):
         pass
     
@@ -58,7 +76,6 @@ class Student(SearchDomain):
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
-        variavel = True
 
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
@@ -75,10 +92,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 student = Student()
                 p = SearchProblem(student,state.get("piece"))
                 t = SearchTree(p,'depth')
-                key = ""
-                if variavel:
-                    key = t.search()
-                    variavel = False
+                key = t.search()
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})

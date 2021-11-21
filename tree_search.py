@@ -36,7 +36,7 @@ class SearchProblem:
         self.domain = domain
         self.positions_initial = positions_initial
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
-        self.actions = ['a']
+        self.actions = ['a', 'd', 'w', 's']
 
     def goal_test(self, positions):
         return self.domain.satisfies(positions)
@@ -99,7 +99,7 @@ class SearchTree:
             lnewnodes = []
             self.non_terminals+=1
             for action in self.problem.actions:
-                new_positions = self.problem.domain.result(node.state, action, node.positions)
+                new_positions = self.problem.domain.result(action, node.positions)
                 if new_positions != []:
                     newnode = SearchNode(node, new_positions)
                     if (not self.inParent(newnode)) and node.depth < limit:
