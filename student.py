@@ -16,6 +16,7 @@ import asyncio
 import getpass
 import json
 import os
+from piece import *
 
 import websockets
 
@@ -38,7 +39,8 @@ class Student(SearchDomain):
             pass
                                      
     def satisfies(self, positions):
-        return True
+
+        pass
 
     def translate(self, x, y, positions):
         x = int(x)
@@ -58,7 +60,6 @@ class Student(SearchDomain):
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
-        variavel = True
 
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
@@ -69,25 +70,21 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     await websocket.recv()
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
 
-                print("OLAAAA ", state)
-
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
                 student = Student()
-                p = SearchProblem(student,state.get("piece"))
+                piece = Piece(state.get("piece"))
+                '''
+                p = SearchProblem(student,piece)
                 t = SearchTree(p,'depth')
+                key = t.search(state)
                 key = ""
-                if variavel:
-                    key = t.search()
-                    variavel = False
-
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
                 )  # send key command to server - you must implement this send in the AI agent
+                 '''
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return
-
-
 
 
 # DO NOT CHANGE THE LINES BELLOW

@@ -85,7 +85,7 @@ class SearchTree:
         return(path)
 
     # procurar a solucao
-    def search(self, limit = math.inf):
+    def search(self, state,limit = math.inf):
         while self.open_nodes != []:
             node = self.open_nodes[0][1]
             action = self.open_nodes.pop(0)[0]
