@@ -26,7 +26,7 @@ class Student(SearchDomain):
     
     def result(self, action, positions):
         
-        if action == 'left':
+        if action == 'a':
             return self.translate(-1,0,positions) 
         elif action == 'right':
             pass
@@ -75,6 +75,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 student = Student()
                 p = SearchProblem(student,state.get("piece"))
                 t = SearchTree(p,'depth')
+                key = ""
                 if variavel:
                     key = t.search()
                     variavel = False
