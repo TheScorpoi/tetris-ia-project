@@ -36,7 +36,8 @@ python -m pygame.examples.aliens
 
 
 ## Commands to update from the main repository
-git remote add upstream https://github.com/dgomes/ia-tetris
-git fetch upstream
-git merge upstream/main --allow-unrelated-histories
+- git remote add upstream https://github.com/dgomes/ia-tetris
+- git fetch upstream
+- git merge upstream/main --allow-unrelated-histories
 
+https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
