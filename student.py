@@ -25,49 +25,25 @@ class Student(SearchDomain):
     def __init__(self):
         pass
     
-    def result(self, action, positions):
+    def result(self, action, piece):
         
         if action == 'a':
-            return self.translate(-1,0,positions) 
+            piece.shape.translate(-1,0)
+            return piece
         elif action == 'd':
-            return self.translate(1,0,positions) 
+            piece.shape.translate(1,0)
+            return piece
         elif action == 's':
             pass
         elif action == 'w': 
-            pass
+            piece.shape.rotate()
+            return piece
+        
                                      
-    def satisfies(self, positions):
-
+    def satisfies(self, piece):
+        return False
         pass
 
-    def translate(self, x, y, positions):
-        x = int(x)
-        y = int(y)
-        positions = [ [cx + x , cy + y ] for cx, cy in positions]
-        if all(-1 < pos[0] < 10 and -1 < pos[1] < 30 for pos in positions):
-            return [ (cx + x , cy + y ) for cx, cy in positions]
-        return []
-
-    '''
-    def set_pos(self, x, y):
-        x = int(x)
-        y = int(y)
-        self.positions = [
-            (cx + x - self._x, cy + y - self._y) for cx, cy in self.positions
-        ]
-        self._x = x
-        self._y = y
-
-    def rotate(self, step=1):
-        rotation = (rotation + step) % len(self.plan)
-        self.positions = [
-            (self._x + x, self._y + y)
-            for y, line in enumerate(self.plan[self.rotation])
-            for x, pos in enumerate(line)
-            if pos == "1"
-        ]
-    '''
-    
     def cost(self, state, action):
         pass
     
@@ -91,7 +67,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
                 student = Student()
                 piece = Piece(state.get("piece"))
-                '''
                 p = SearchProblem(student,piece)
                 t = SearchTree(p,'depth')
                 key = t.search(state)
@@ -99,7 +74,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
                 )  # send key command to server - you must implement this send in the AI agent
-                 '''
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return

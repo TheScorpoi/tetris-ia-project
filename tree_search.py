@@ -10,7 +10,7 @@ class SearchDomain(ABC):
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
     @abstractmethod
-    def result(self, action, positions):
+    def result(self, action, piece):
         pass
 
     # custo de uma accao num estado
@@ -25,27 +25,27 @@ class SearchDomain(ABC):
 
     # test if the given "goal" is satisfied in "state"
     @abstractmethod
-    def satisfies(self, positions):
+    def satisfies(self, piece):
         pass
 
 
 # Problemas concretos a resolver
 # dentro de um determinado dominio
 class SearchProblem:
-    def __init__(self, domain, positions_initial):
+    def __init__(self, domain, piece):
         self.domain = domain
-        self.positions_initial = positions_initial
+        self.piece = piece
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
         self.actions = ['a', 'd', 'w', 's']
 
-    def goal_test(self, positions):
-        return self.domain.satisfies(positions)
+    def goal_test(self, piece):
+        return self.domain.satisfies(piece)
 
 # Nos de uma arvore de pesquisa
 class SearchNode:
-    def __init__(self, parent, positions): 
+    def __init__(self, parent, piece): 
         self.parent = parent
-        self.positions = positions 
+        self.piece = piece 
         self.final = False
         self.cost = 0 
         self.heuristic = 0
@@ -66,7 +66,7 @@ class SearchTree:
     # construtor
     def __init__(self,problem, strategy='breadth'): 
         self.problem = problem
-        root = SearchNode(None, problem.positions_initial)
+        root = SearchNode(None, problem.piece)
         #root.heuristic = self.problem.domain.heuristic(root.state, self.problem.goal)
         self.open_nodes = [('', root)]
         self.strategy = strategy
@@ -89,7 +89,7 @@ class SearchTree:
         while self.open_nodes != []:
             node = self.open_nodes[0][1]
             action = self.open_nodes.pop(0)[0]
-            if self.problem.goal_test(node.positions):
+            if self.problem.goal_test(node.piece):
                 self.solution = node
                 self.length = len(self.get_path(node)) - 1
                 self.terminals = len(self.open_nodes) + 1
@@ -99,9 +99,12 @@ class SearchTree:
             lnewnodes = []
             self.non_terminals+=1
             for action in self.problem.actions:
-                new_positions = self.problem.domain.result(action, node.positions)
-                if new_positions != []:
-                    newnode = SearchNode(node, new_positions)
+                print("Peça antes da acao:" + str(node.piece))
+                print("Acao " + action)
+                new_piece = self.problem.domain.result(action, node.piece)
+                print("Peça apos a acao:" + str(new_piece))
+                if new_piece != []:
+                    newnode = SearchNode(node, new_piece)
                     if (not self.inParent(newnode)) and node.depth < limit:
                         #newnode.cost = node.cost + self.problem.domain.cost(node.state, (node.state, newstate))
                         #newnode.heuristic = self.problem.domain.heuristic(newnode.state, self.problem.goal)

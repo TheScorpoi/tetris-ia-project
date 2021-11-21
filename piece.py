@@ -1,25 +1,67 @@
 from shape import SHAPES, Shape
 
+S = [
+    [".....", ".....", "..11.", ".11..", "....."],
+    [".....", "..1..", "..11.", "...1.", "....."],
+]
+
+Z = [
+    [".....", ".....", ".11..", "..11.", "....."],
+    [".....", "..1..", ".11..", ".1...", "....."],
+]
+
+I = [
+    ["..1..", "..1..", "..1..", "..1..", "....."],
+    [".....", "1111.", ".....", ".....", "....."],
+]
+
+O = [[".....", ".....", ".11..", ".11..", "....."]]
+
+
+J = [
+    [".....", ".1...", ".111.", ".....", "....."],
+    [".....", "..11.", "..1..", "..1..", "....."],
+    [".....", ".....", ".111.", "...1.", "....."],
+    [".....", "..1..", "..1..", ".11..", "....."],
+]
+
+L = [
+    [".....", "...1.", ".111.", ".....", "....."],
+    [".....", "..1..", "..1..", "..11.", "....."],
+    [".....", ".....", ".111.", ".1...", "....."],
+    [".....", ".11..", "..1..", "..1..", "....."],
+]
+
+T = [
+    [".....", "..1..", ".111.", ".....", "....."],
+    [".....", "..1..", "..11.", "..1..", "....."],
+    [".....", ".....", ".111.", "..1..", "....."],
+    [".....", "..1..", ".11..", "..1..", "....."],
+]
 
 class Piece:
-    
-    def __init__(self, positions):
-        self.positions = positions
-        shape = None
-        if self.positions == [[4,2], [4,3], [5,3], [4,4] ]:
-            shape = Shape(SHAPES.T)
-        elif self.positions == [[4,2], [4,3], [4,4], [5,4] ]:
-            shape = Shape(SHAPES.L)
-        elif self.positions == [[3,3], [4,3], [3,4], [4,4] ]:
-            shape = Shape(SHAPES.O)
-        elif self.positions == [[4,2], [5,2], [4,3], [4,4] ]:
-            shape = Shape(SHAPES.J)
-        elif self.positions == [[4,2], [4,3], [5,3], [5,4] ]:
-            shape = Shape(SHAPES.S)
-        elif self.positions == [[2,2], [3,2], [4,2], [5,2] ]:
-            shape = Shape(SHAPES.I)
-        elif self.positions == [[4,2], [3,3], [4,3], [3,4] ]:
-            shape = Shape(SHAPES.Z)
-        print(shape)
+    lastShape = None
 
+    def __init__(self, positions):
+        self.shape = None
+        if positions == [[4,2], [4,3], [5,3], [4,4] ]:
+            self.shape = Shape(T)
+        elif positions == [[4,2], [4,3], [4,4], [5,4] ]:
+            self.shape = Shape(L)
+        elif positions == [[3,3], [4,3], [3,4], [4,4] ]:
+            self.shape = Shape(O)
+        elif positions == [[4,2], [5,2], [4,3], [4,4] ]:
+            self.shape = Shape(J)
+        elif positions == [[4,2], [4,3], [5,3], [5,4] ]:
+            self.shape = Shape(S)
+        elif positions == [[2,2], [3,2], [4,2], [5,2] ]:
+            self.shape = Shape(I)
+        elif positions == [[4,2], [3,3], [4,3], [3,4] ]:
+            self.shape = Shape(Z)
+        else:
+            self.shape =Piece.lastShape
+        Piece.lastShape = self.shape
+
+    def __str__(self) -> str:
+        return self.shape.__str__()
     
