@@ -37,7 +37,7 @@ class SearchProblem:
         self.domain = domain
         self.piece = piece
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
-        self.actions = ['a', 'd', 'w', '']
+        self.actions = ['a', 'd', 'w', '', 's']
 
     def goal_test(self, all_possibilities, stateGame):
         return self.domain.satisfies(all_possibilities, stateGame)
