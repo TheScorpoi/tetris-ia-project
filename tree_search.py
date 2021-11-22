@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from copy import deepcopy
 import math
 
 class SearchDomain(ABC):
@@ -36,10 +37,10 @@ class SearchProblem:
         self.domain = domain
         self.piece = piece
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
-        self.actions = ['a', 'd', 'w', 's']
+        self.actions = ['a', 'd', 'w', '']
 
-    def goal_test(self, piece):
-        return self.domain.satisfies(piece)
+    def goal_test(self, all_possibilities, stateGame):
+        return self.domain.satisfies(all_possibilities, stateGame)
 
 # Nos de uma arvore de pesquisa
 class SearchNode:
@@ -85,7 +86,15 @@ class SearchTree:
         return(path)
 
     # procurar a solucao
-    def search(self, state,limit = math.inf):
+    def search(self, stateGame,limit = math.inf):
+        all_possibilities = []
+        for action in self.problem.actions:
+            new_piece = self.problem.domain.result(action, self.open_nodes[0][1].piece)
+            all_possibilities.append((deepcopy(new_piece), action))
+        action = self.problem.goal_test(all_possibilities, stateGame)
+        return action
+        
+        '''
         while self.open_nodes != []:
             node = self.open_nodes[0][1]
             action = self.open_nodes.pop(0)[0]
@@ -111,6 +120,7 @@ class SearchTree:
                         lnewnodes.append((action,newnode))
             self.add_to_open(lnewnodes)
         return None
+        '''
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia
     def add_to_open(self,lnewnodes):

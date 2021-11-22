@@ -59,7 +59,7 @@ class Piece:
         elif positions == [[4,2], [3,3], [4,3], [3,4] ]:
             self.shape = Shape(Z)
         else:
-            self.shape =Piece.lastShape
+            self.shape = Piece.lastShape
         Piece.lastShape = self.shape
 
     def __str__(self) -> str:

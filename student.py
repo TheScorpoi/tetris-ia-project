@@ -33,16 +33,43 @@ class Student(SearchDomain):
         elif action == 'd':
             piece.shape.translate(1,0)
             return piece
-        elif action == 's':
-            pass
+        elif action == '':
+            return piece
         elif action == 'w': 
             piece.shape.rotate()
             return piece
         
                                      
-    def satisfies(self, piece):
-        return False
-        pass
+    def satisfies(self, all_possibilities, stateGame):
+        #print("JOgo de agr" + str(stateGame))
+        action_heuristic = {}
+        for piece_action in all_possibilities:
+            piece = piece_action[0]
+            positions_piece = []
+            for pos in piece.shape.positions:
+                positions_piece.append([pos[0], pos[1]])
+
+            future_stateGame = stateGame["game"] + positions_piece
+
+            action_heuristic[piece_action[1]] = self.aggregate_height(future_stateGame)
+            #print("Futuro jogo ", future_stateGame)
+        
+        min_heuristic = ("a", action_heuristic["a"])
+        for key in action_heuristic:
+            print("Action: " ,key, " , heuristica " , action_heuristic[key])
+            if min_heuristic[1] > action_heuristic[key]:
+                min_heuristic = (key, action_heuristic[key])
+
+
+        return min_heuristic[0]
+
+    def aggregate_height(self, state):
+        high_column = [0,0,0,0,0,0,0,0]
+        for coord in state:
+            if high_column[coord[0] - 1] < (30 - coord[1]):
+                high_column[coord[0] - 1] =  30 - coord[1]
+        print("Coluninhas ", high_column)
+        return sum(high_column)
 
     def cost(self, state, action):
         pass
@@ -70,7 +97,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 p = SearchProblem(student,piece)
                 t = SearchTree(p,'depth')
                 key = t.search(state)
-                key = ""
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
                 )  # send key command to server - you must implement this send in the AI agent
