@@ -135,7 +135,6 @@ class Student(SearchDomain):
                 completed += 1
                 x = 1
                 y += 1
-        print("\nCOMPLETED:           ", completed, "\n")
         return completed
     
     def columns_height(self, state):
