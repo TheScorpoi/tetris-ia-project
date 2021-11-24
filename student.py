@@ -65,9 +65,9 @@ class Student(SearchDomain):
             future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
-            print("JOgo de agr" + str(stateGame))
-            print("Peca de agr dps da acao", positions_piece)
-            print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
+            #print("JOgo de agr" + str(stateGame))
+            #print("Peca de agr dps da acao", positions_piece)
+            #print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
 
             action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
             #print("Futuro jogo ", future_stateGame)
@@ -150,7 +150,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
 
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
-                print("STATE ", state)
+                #print("STATE ", state)
                 if state.get("piece") != None:
                     if first_time == True: 
                         piece = Piece(state.get("piece"))
