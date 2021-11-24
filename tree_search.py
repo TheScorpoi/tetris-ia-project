@@ -34,7 +34,8 @@ class SearchProblem:
         self.piece = piece
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
         #self.actions = ['a', 'd', 'w', '', 's']
-        self.actions = ['dadwwwawwwddwwwdwww']
+        self.actions = [ 'd', 'dw', 'dww', 'dwww', 'dd', 'ddw', 'ddww', 'ddwww', 'ddd', 'dddw', 'dddww', 'dddwww', 'dddd', 'ddddw', 'ddddww', 'ddddwww', 'dddd', 'ddddw', 'ddddww', 'ddddwww', 'ddddd', 'dddddw', 'dddddww', 'dddddwww', 'dddddd', 'ddddddw', 'ddddddww', 'ddddddwww',
+            'a', 'aw', 'aww', 'awww', 'aa', 'aaw', 'aaww', 'aawww', 'aaa', 'aaaw', 'aaaww', 'aaawww', 'aaaa', 'aaaaw', 'aaaaww', 'aaaawww', 'aaaa', 'aaaaw', 'aaaaww', 'aaaawww', 'aaaaa', 'aaaaaw', 'aaaaaww', 'aaaaawww', 'aaaaaa', 'aaaaaaw', 'aaaaaaww', 'aaaaaawww', 'w', 'ww', 'www', '']
 
     def goal_test(self, all_possibilities, stateGame):
         return self.domain.satisfies(all_possibilities, stateGame)
