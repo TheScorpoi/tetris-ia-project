@@ -43,7 +43,7 @@ class Student(SearchDomain):
                 positions_piece.append([deepcopy(pos)[0], deepcopy(pos)[1]])
                 abcissas_piece.append(pos[0])
 
-            miny_instateGame = 30
+            miny_instateGame = 29
             if stateGame["game"] != []:
                 for c in stateGame["game"]:
                     if miny_instateGame > c[1] and c[0] in abcissas_piece:

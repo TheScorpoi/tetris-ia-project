@@ -33,7 +33,8 @@ class SearchProblem:
         self.piece = piece
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
         #self.actions = ['a', 'd', 'w', '', 's']
-        self.actions = ['awwwwawww', 'dwwwdwww', 'w', '']
+        self.actions = [ 'd', 'dw', 'dww', 'dwww', 'dd', 'ddw', 'ddww', 'ddwww', 'ddd', 'dddw', 'dddww', 'dddwww', 'dddd', 'ddddw', 'ddddww', 'ddddwww', 'dddd', 'ddddw', 'ddddww', 'ddddwww', 'ddddd', 'dddddw', 'dddddww', 'dddddwww', 'dddddd', 'ddddddw', 'ddddddww', 'ddddddwww',
+            'a', 'aw', 'aww', 'awww', 'aa', 'aaw', 'aaww', 'aawww', 'aaa', 'aaaw', 'aaaww', 'aaawww', 'aaaa', 'aaaaw', 'aaaaww', 'aaaawww', 'aaaa', 'aaaaw', 'aaaaww', 'aaaawww', 'aaaaa', 'aaaaaw', 'aaaaaww', 'aaaaawww', 'aaaaaa', 'aaaaaaw', 'aaaaaaww', 'aaaaaawww', 'w', 'ww', 'www']
 
 
     def goal_test(self, all_possibilities, stateGame):
@@ -42,12 +43,11 @@ class SearchProblem:
      # procurar a solucao
     def search(self, stateGame,limit = math.inf):
         all_possibilities = []
-        for actions in self.actions:
-            for action in actions:
-                #print("Peca ", self.piece)
-                new_piece = self.domain.result(action, deepcopy(self.piece))
-                #print("Nova peca apos a acao ", action, " : ", new_piece)
-                all_possibilities.append((deepcopy(new_piece), action))
+        for action in self.actions:
+            #print("Peca ", self.piece)
+            new_piece = self.domain.result(action, deepcopy(self.piece))
+            #print("Nova peca apos a acao ", action, " : ", new_piece)
+            all_possibilities.append((deepcopy(new_piece), action))
         #print("ALL POSSIBILITIES (TEM QUE DAR cois dif)")
         #for c in all_possibilities:
             #print(f"{c[0]}")
