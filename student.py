@@ -43,7 +43,7 @@ class Student(SearchDomain):
                 positions_piece.append([deepcopy(pos)[0], deepcopy(pos)[1]])
                 abcissas_piece.append(pos[0])
 
-            miny_instateGame = 30
+            miny_instateGame = 29
             if stateGame["game"] != []:
                 for c in stateGame["game"]:
                     if miny_instateGame > c[1] and c[0] in abcissas_piece:
@@ -129,8 +129,9 @@ class Student(SearchDomain):
     def columns_height(self, state):
         high_column = [0,0,0,0,0,0,0,0]
         for coord in state:
-            if high_column[coord[0] - 1] < (30 - coord[1]):
-                high_column[coord[0] - 1] =  30 - coord[1]
+            if coord[0] <= 8 and coord[0] >= 0:
+                if high_column[coord[0] - 1] < (30 - coord[1]):
+                    high_column[coord[0] - 1] =  30 - coord[1]
         return high_column
 
     # custo estimado de chegar de um estado a outro
