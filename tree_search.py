@@ -52,4 +52,4 @@ class SearchProblem:
         #for c in all_possibilities:
             #print(f"{c[0]}")
         action = self.goal_test(all_possibilities, stateGame)
-        return action
+        return action 

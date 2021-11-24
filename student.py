@@ -28,7 +28,6 @@ class Student(SearchDomain):
         
                                      
     def satisfies(self, all_possibilities, stateGame):
-        #print("JOgo de agr" + str(stateGame))
         action_heuristic = {}
         for piece_action in all_possibilities:
             piece = deepcopy(piece_action[0])
@@ -66,8 +65,9 @@ class Student(SearchDomain):
             future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
-            #print("Peca de agr", positions_piece)
-            #print("Peça agr em baixo ", positions_piece_bottom)
+            print("JOgo de agr" + str(stateGame))
+            print("Peca de agr dps da acao", positions_piece)
+            print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
 
             action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
             #print("Futuro jogo ", future_stateGame)
@@ -141,6 +141,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
 
+        first_time = True
         student = Student()
         while True:
             try:
@@ -151,13 +152,32 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
                 print("STATE ", state)
                 if state.get("piece") != None:
-                    piece = Piece(state.get("piece"))
-                    p = SearchProblem(student,piece)
-                 #   print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
-                    key = p.search(state)
-                    await websocket.send(
-                        json.dumps({"cmd": "key", "key": key})
-                    )  # send key command to server - you must implement this send in the AI agent
+                    if first_time == True: 
+                        piece = Piece(state.get("piece"))
+                        p = SearchProblem(student,piece)
+                    #   print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
+                        key = p.search(state)
+                        await websocket.send(
+                            json.dumps({"cmd": "key", "key": key})
+                        )  # send key command to server - you must implement this send in the AI agent
+                        first_time = False
+                    else:
+                        '''
+                        key = "s"
+                        await websocket.send(
+                            json.dumps({"cmd": "key", "key": key})
+                        )  # send key command to server - you must implement this send in the AI agent
+                        '''
+                        piece = Piece(state.get("piece"))
+                        p = SearchProblem(student,piece)
+                    #   print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
+                        key = p.search(state)
+                        await websocket.send(
+                            json.dumps({"cmd": "key", "key": key})
+                        )  # send key command to server - you must implement this send in the AI agent
+                        first_time = False
+                elif state.get("piece") == None:
+                    first_time = True
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return

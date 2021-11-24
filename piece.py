@@ -71,20 +71,36 @@ class Piece:
     def set_pos(self, x, y):
         x = int(x)
         y = int(y)
-        self.positions = [
+        positions_temp = [
             (cx + x - self._x, cy + y - self._y) for cx, cy in self.positions
         ]
-        self._x = x
-        self._y = y
+
+        if self.chek_update(positions_temp):
+            self.positions = positions_temp
+            self._x = x
+            self._y = y
+
 
     def rotate(self, step=1):
         self.rotation = (self.rotation + step) % len(self.plan)
-        self.positions = [
+        positions_temp = [
             (self._x + x, self._y + y)
             for y, line in enumerate(self.plan[self.rotation])
             for x, pos in enumerate(line)
             if pos == "1"
         ]
+
+        if self.chek_update(positions_temp):
+            self.positions = positions_temp
+
+    def chek_update(self, positions_temp):
+        flag = True 
+        for coord in positions_temp:
+            if coord[0] < 1 or coord[0] > 8:
+                flag = False
+            elif coord[1] < 0 or coord[1] > 29:
+                flag = False
+        return flag
 
     def translate(self, x, y):
         self.set_pos(self._x + x, self._y + y)
