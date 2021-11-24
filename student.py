@@ -36,28 +36,30 @@ class Student(SearchDomain):
         action_heuristic = {}
         for piece_action in all_possibilities:
             piece = deepcopy(piece_action[0])
+
+            abcissas_piece = []
             positions_piece = deepcopy([])
             for pos in piece.positions:
                 positions_piece.append([deepcopy(pos)[0], deepcopy(pos)[1]])
+                abcissas_piece.append(pos[0])
 
-            miny_instateGame = math.inf
+            miny_instateGame = 30
             if stateGame["game"] != []:
                 for c in stateGame["game"]:
-                    if miny_instateGame > c[1]:
+                    if miny_instateGame > c[1] and c[0] in abcissas_piece:
                         miny_instateGame = c[1]
-            else:
-                miny_instateGame = 30
 
             #print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE =)")
             #for c in all_possibilities:
                 #print(f"{c[0]}")
             #print("Deepcopy funciona fds, Peca de agr", positions_piece)
+
             positions_piece_bottom = deepcopy(positions_piece)
             flag = True
             while flag:
 
                 for c in range(len(positions_piece)):
-                    if positions_piece_bottom[c][1] + 1 >= miny_instateGame:
+                    if positions_piece_bottom[c][1] + 1 >= miny_instateGame and positions_piece_bottom[c][0] in abcissas_piece:
                         flag = False
 
                 if flag:
@@ -150,7 +152,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
 
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
-                #print("STATE ", state)
+                print("STATE ", state)
                 if state.get("piece") != None:
                     piece = Piece(state.get("piece"))
                     p = SearchProblem(student,piece)
