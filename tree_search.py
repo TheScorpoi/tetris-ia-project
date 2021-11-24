@@ -34,7 +34,7 @@ class SearchProblem:
         self.piece = piece
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
         #self.actions = ['a', 'd', 'w', '', 's']
-        self.actions = ['wwwawwwawww', 'ddddwwwdwww', 'w', '']
+        self.actions = ['dadwwwawwwddwwwdwww']
 
     def goal_test(self, all_possibilities, stateGame):
         return self.domain.satisfies(all_possibilities, stateGame)
@@ -42,15 +42,15 @@ class SearchProblem:
      # procurar a solucao
     def search(self, stateGame,limit = math.inf):
         all_possibilities = []
-        lista = []
+        str = ""
         for actions in self.actions:
-            for action1 in actions:
-                lista.append(action1)
-                for action in lista:
-                    #print("Peca ", self.piece)
-                    new_piece = self.domain.result(action, deepcopy(self.piece))
-                    #print("Nova peca apos a acao ", action, " : ", new_piece)
-                    all_possibilities.append((deepcopy(new_piece), action))
+            #print("Peca ", self.piece)
+            for action in actions:
+                str += action
+                print("action", str)
+                new_piece = self.domain.result(str, deepcopy(self.piece))
+                #print("Nova peca apos a acao ", action, " : ", new_piece)
+                all_possibilities.append((deepcopy(new_piece), str))
         #print("ALL POSSIBILITIES (TEM QUE DAR cois dif)")
         #for c in all_possibilities:
             #print(f"{c[0]}")
