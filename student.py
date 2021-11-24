@@ -13,18 +13,22 @@ class Student(SearchDomain):
     def __init__(self):
         pass
     
-    def result(self, actions, piece):
-
-        for action in actions:
-            if action == 'a':
-                piece.translate(-1,0)
-            elif action == 'd':
-                piece.translate(1,0)
-            elif action == 'w': 
-                piece.rotate()
-            elif action == 's':
-                piece.translate(0,1)
-        return piece
+    def result(self, action, piece):
+        
+        if action == 'a':
+            piece.translate(-1,0)
+            return piece
+        elif action == 'd':
+            piece.translate(1,0)
+            return piece
+        elif action == '':
+            return piece
+        elif action == 'w': 
+            piece.rotate()
+            return piece
+        elif action == 's':
+            piece.translate(0,1)
+            return piece
         
                                      
     def satisfies(self, all_possibilities, stateGame):
