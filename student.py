@@ -84,63 +84,52 @@ class Student(SearchDomain):
         return min_heuristic[0]
 
     def aggregate_height(self, state):
-        high_column = [0,0,0,0,0,0,0,0]
-        for coord in state:
-            if high_column[coord[0] - 1] < (30 - coord[1]):
-                high_column[coord[0] - 1] =  30 - coord[1]
-        #print("Coluninhas ", high_column)
+        high_column = self.columns_height(state)
         return sum(high_column)
 
     def bumpiness(self,state):
-        high_column = [0,0,0,0,0,0,0,0]
-        for coord in state:
-            if high_column[coord[0] - 1] < (30 - coord[1]):
-                high_column[coord[0] - 1] =  30 - coord[1]
-
-        return abs(high_column[0] - high_column[1]) + abs(high_column[2] - high_column[3]) + abs(high_column[4] - high_column[5]) + abs(high_column[6] - high_column[7])
+        bumpiness = 0
+        high_column = self.columns_height(state)
+        for i in range(len(high_column) - 1):
+            bumpiness += abs(high_column[i] - high_column[i+1])
+        return bumpiness
 
     def holes(self, state):
-        high_column = [0,0,0,0,0,0,0,0]
+        holes = 0
+        max_height = max(self.columns_height(state))
+        y = 30 - max_height
         for coord in state:
-            if high_column[coord[0] - 1] < (30 - coord[1]):
-                high_column[coord[0] - 1] =  30 - coord[1]
-        
-        hole = 0
-        for max_column in high_column:
-            idx = 30 - max_column
-            i = 1
-            for coord in state:
-                if coord[0] == i:
-                    lista = [i, idx]
-                    idx += 1
-                    if lista not in state:
-                        hole += 1
-            i += 1
-        
-        return hole
+                if (y + 1) < 30:
+                    coord_below= [coord[0], y + 1]
+                    y += 1
+                    if coord_below not in state:
+                        holes += 1
+        return holes
     
     def completed_lines(self, state):
-        high_column = [0,0,0,0,0,0,0,0]
+        highest = max(self.columns_height(state))
         completed = 0
+        y = 30 - highest
+        x = 1
+        for _ in range(y * 8):        
+            coord_tmp = [x , y]
+            if coord_tmp in state:
+                x += 1
+            else:
+                y += 1
+                x = 1
+            if x == 8:
+                completed += 1
+                x = 1
+                y += 1
+        return completed
+    
+    def columns_height(self, state):
+        high_column = [0,0,0,0,0,0,0,0]
         for coord in state:
             if high_column[coord[0] - 1] < (30 - coord[1]):
                 high_column[coord[0] - 1] =  30 - coord[1]
-        
-        highest = max(high_column)
-
-        for coord in state:
-            idx = 30 - highest
-            i = 1
-            lista = [i , idx]
-            if lista in state:
-                i += 1
-            else:
-                idx +=1
-                i = 1
-            
-            if i == 8:
-                completed += 1 
-        return completed
+        return high_column
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):
