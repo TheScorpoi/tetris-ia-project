@@ -1,15 +1,3 @@
-#
-# Module: cidades
-# 
-# Implements a SearchDomain for find paths between cities
-# using the tree_search module
-#
-# (c) Luis Seabra Lopes
-# Introducao a Inteligencia Artificial, 2012-2020
-# Inteligência Artificial, 2014-2020
-#
-
-
 from tree_search import *
 import math
 import asyncio
@@ -28,30 +16,30 @@ class Student(SearchDomain):
     def result(self, action, piece):
         
         if action == 'a':
-            piece.shape.translate(-1,0)
+            piece.translate(-1,0)
             return piece
         elif action == 'd':
-            piece.shape.translate(1,0)
+            piece.translate(1,0)
             return piece
         elif action == '':
             return piece
         elif action == 'w': 
-            piece.shape.rotate()
+            piece.rotate()
             return piece
         elif action == 's':
-            piece.shape.translate(0,1)
+            piece.translate(0,1)
             return piece
         
                                      
     def satisfies(self, all_possibilities, stateGame):
-        print("JOgo de agr" + str(stateGame))
+        #print("JOgo de agr" + str(stateGame))
         action_heuristic = {}
         for piece_action in all_possibilities:
             piece = deepcopy(piece_action[0])
             positions_piece = deepcopy([])
-            for pos in piece.shape.positions:
-                positions_piece.append([pos[0], pos[1]])
-            '''
+            for pos in piece.positions:
+                positions_piece.append([deepcopy(pos)[0], deepcopy(pos)[1]])
+
             miny_instateGame = math.inf
             if stateGame["game"] != []:
                 for c in stateGame["game"]:
@@ -60,10 +48,10 @@ class Student(SearchDomain):
             else:
                 miny_instateGame = 30
 
-            print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE =)")
-            for c in all_possibilities:
-                print(f"{c[0]}")
-            print("Deepcopy funciona fds, Peca de agr", positions_piece)
+            #print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE =)")
+            #for c in all_possibilities:
+                #print(f"{c[0]}")
+            #print("Deepcopy funciona fds, Peca de agr", positions_piece)
             positions_piece_bottom = deepcopy(positions_piece)
             flag = True
             while flag:
@@ -76,12 +64,11 @@ class Student(SearchDomain):
                     for c in range(len(positions_piece)):
                         val = positions_piece_bottom[c][1] + 1
                         positions_piece_bottom[c][1] = val
-            '''
 
-            #future_stateGame = deepcopy( stateGame["game"] + positions_piece_bottom) 
-            future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
+            future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
+            #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
-            print("Peca de agr", positions_piece)
+            #print("Peca de agr", positions_piece)
             #print("Peça agr em baixo ", positions_piece_bottom)
 
             action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
@@ -89,7 +76,7 @@ class Student(SearchDomain):
         
         min_heuristic = ("a", action_heuristic["a"])
         for key in action_heuristic:
-            print("Action: " ,key, " , heuristica " , action_heuristic[key])
+            #print("Action: " ,key, " , heuristica " , action_heuristic[key])
             if min_heuristic[1] < action_heuristic[key]:
                 min_heuristic = (key, action_heuristic[key])
 
@@ -144,9 +131,6 @@ class Student(SearchDomain):
                 high_column[coord[0] - 1] =  30 - coord[1]
         return high_column
 
-    def cost(self, state, action):
-        pass
-    
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):
         #return self.aggregate_height(state) + self.bumpiness(state) + self.holes(state) + self.completed_lines(state)
@@ -158,6 +142,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
 
+        student = Student()
         while True:
             try:
                 state = json.loads(
@@ -165,14 +150,15 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
 
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
-                student = Student()
-                piece = Piece(state.get("piece"))
-                p = SearchProblem(student,piece)
-                t = SearchTree(p,'depth')
-                key = t.search(state)
-                await websocket.send(
-                    json.dumps({"cmd": "key", "key": key})
-                )  # send key command to server - you must implement this send in the AI agent
+                #print("STATE ", state)
+                if state.get("piece") != None:
+                    piece = Piece(state.get("piece"))
+                    p = SearchProblem(student,piece)
+                 #   print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
+                    key = p.search(state)
+                    await websocket.send(
+                        json.dumps({"cmd": "key", "key": key})
+                    )  # send key command to server - you must implement this send in the AI agent
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return

@@ -40,28 +40,70 @@ T = [
 ]
 
 class Piece:
-    lastShape = None
+    lastPlan = None
 
     def __init__(self, positions):
-        self.shape = None
+        self.positions = positions
+        self.plan = None
+        #print("positions rere", positions)
         if positions == [[4,2], [4,3], [5,3], [4,4] ]:
-            self.shape = Shape(T)
+            self.plan = T
         elif positions == [[4,2], [4,3], [4,4], [5,4] ]:
-            self.shape = Shape(L)
+            self.plan = L
         elif positions == [[3,3], [4,3], [3,4], [4,4] ]:
-            self.shape = Shape(O)
+            self.plan = O
         elif positions == [[4,2], [5,2], [4,3], [4,4] ]:
-            self.shape = Shape(J)
+            self.plan = J
         elif positions == [[4,2], [4,3], [5,3], [5,4] ]:
-            self.shape = Shape(S)
+            self.plan = S
         elif positions == [[2,2], [3,2], [4,2], [5,2] ]:
-            self.shape = Shape(I)
+            self.plan = I
         elif positions == [[4,2], [3,3], [4,3], [3,4] ]:
-            self.shape = Shape(Z)
+            self.plan = Z
         else:
-            self.shape = Piece.lastShape
-        Piece.lastShape = self.shape
+            self.plan = Piece.lastPlan
+        
+        Piece.lastPlan = self.plan
+        self.rotation = 0
+        self._x = 0
+        self._y = 0
+
+    def set_pos(self, x, y):
+        x = int(x)
+        y = int(y)
+        self.positions = [
+            (cx + x - self._x, cy + y - self._y) for cx, cy in self.positions
+        ]
+        self._x = x
+        self._y = y
+
+    def rotate(self, step=1):
+        self.rotation = (self.rotation + step) % len(self.plan)
+        self.positions = [
+            (self._x + x, self._y + y)
+            for y, line in enumerate(self.plan[self.rotation])
+            for x, pos in enumerate(line)
+            if pos == "1"
+        ]
+
+    def translate(self, x, y):
+        self.set_pos(self._x + x, self._y + y)
+
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, x):
+        self.set_pos(x, self._y)
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, y):
+        self.set_pos(self._x, y)
 
     def __str__(self) -> str:
-        return self.shape.__str__()
-    
+        return f"Shape({self._x},{self._y}) -> {self.positions} -> {self.plan}"
