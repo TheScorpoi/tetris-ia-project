@@ -124,7 +124,7 @@ class Student(SearchDomain):
         completed = 0
         y = 30 - highest
         x = 1
-        for _ in range(y * 8):        
+        for _ in range(y * 8):     
             coord_tmp = [x , y]
             if coord_tmp in state:
                 x += 1

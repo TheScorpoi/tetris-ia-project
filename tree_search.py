@@ -38,7 +38,7 @@ class SearchProblem:
         self.piece = piece
         #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
         #self.actions = ['a', 'd', 'w', '', 's']
-        self.actions = ['a', 'd', 'w', '']
+        self.actions = ['awwwwawww', 'dwwwdwww', 'w', '']
 
 
     def goal_test(self, all_possibilities, stateGame):
@@ -90,9 +90,10 @@ class SearchTree:
     # procurar a solucao
     def search(self, stateGame,limit = math.inf):
         all_possibilities = []
-        for action in self.problem.actions:
-            new_piece = self.problem.domain.result(action, self.open_nodes[0][1].piece)
-            all_possibilities.append((deepcopy(new_piece), action))
+        for actions in self.problem.actions:
+            for action in actions:
+                new_piece = self.problem.domain.result(action, self.open_nodes[0][1].piece)
+                all_possibilities.append((deepcopy(new_piece), action))
         action = self.problem.goal_test(all_possibilities, stateGame)
         return action
         
