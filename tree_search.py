@@ -32,11 +32,10 @@ class SearchProblem:
     def __init__(self, domain, piece):
         self.domain = domain
         self.piece = piece
-        #self.actions = ["left", "right", "down", "drop", "turn_right", "turn_left"]
-        #self.actions = ['a', 'd', 'w', '', 's']
-        self.actions = [ 'd', 'dw', 'dww', 'dwww', 'dd', 'ddw', 'ddww', 'ddwww', 'ddd', 'dddw', 'dddww', 'dddwww', 'dddd', 'ddddw', 'ddddww', 'ddddwww', 'dddd', 'ddddw', 'ddddww', 'ddddwww', 'ddddd', 'dddddw', 'dddddww', 'dddddwww', 'dddddd', 'ddddddw', 'ddddddww', 'ddddddwww',
-            'a', 'aw', 'aww', 'awww', 'aa', 'aaw', 'aaww', 'aawww', 'aaa', 'aaaw', 'aaaww', 'aaawww', 'aaaa', 'aaaaw', 'aaaaww', 'aaaawww', 'aaaa', 'aaaaw', 'aaaaww', 'aaaawww', 'aaaaa', 'aaaaaw', 'aaaaaww', 'aaaaawww', 'aaaaaa', 'aaaaaaw', 'aaaaaaww', 'aaaaaawww', 'w', 'ww', 'www', '']
-
+        #self.actions = ['w', 'ww', 'www', 'wwwa', 'wwwaw', 'wwwaww', 'wwwawww', 'wwwawwwa', 'wwwawwww', 'wwwawwwwa', 'wwwawwwwaw', 'wwwawwwwaww', 'wwwawwwwawww','d', 'dw', 'dww', 'dwww', 'dwwwd', 'dwwwdw', 'dwwwdww', 'dwwwdwww', 'dwwwdwww', 'dwwwdwwwd']                    
+        self.actions = ['a', 'aa', 'aaa', 'd', 'dd' 'ddd', 'dddd', '',
+                        'aw', 'aaw', 'aaaw', 'dw', 'ddw' 'dddw', 'ddddw' ]
+        
     def goal_test(self, all_possibilities, stateGame):
         return self.domain.satisfies(all_possibilities, stateGame)
 
