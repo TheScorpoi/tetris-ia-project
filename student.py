@@ -66,6 +66,11 @@ class Student(SearchDomain):
                         positions_piece_bottom[c][1] = val
 
             future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
+            print()
+            print()
+            print("FUTURO E MAIS ALEM:      ", future_stateGame)
+            print()
+            print()
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
             #print("JOgo de agr" + str(stateGame))
@@ -84,17 +89,20 @@ class Student(SearchDomain):
                 min_heuristic = action_heuristic[key]
                 action_to_do = key 
 
-        print()
-        print()
-        print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
-        print()
-        print()
+        #print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
         
         return action_to_do
 
 
     def aggregate_height(self, state):
         high_column = self.columns_height(state)
+        print()
+        print()
+        print()
+        print(high_column)
+        print()
+        print()
+        print()
         return sum(high_column)
 
     def bumpiness(self,state):
@@ -177,7 +185,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 json.dumps({"cmd": "key", "key": action})
                                 
                             )  # send key command to server - you must implement this send in the AI agent
-                            time.sleep(0.5)
+                            time.sleep(0.15)
                             
 
             except websockets.exceptions.ConnectionClosedOK:

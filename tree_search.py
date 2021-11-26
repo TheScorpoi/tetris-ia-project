@@ -33,6 +33,7 @@ class SearchProblem:
         self.domain = domain
         self.piece = piece
         #self.actions = ['w', 'ww', 'www', 'wwwa', 'wwwaw', 'wwwaww', 'wwwawww', 'wwwawwwa', 'wwwawwww', 'wwwawwwwa', 'wwwawwwwaw', 'wwwawwwwaww', 'wwwawwwwawww','d', 'dw', 'dww', 'dwww', 'dwwwd', 'dwwwdw', 'dwwwdww', 'dwwwdwww', 'dwwwdwww', 'dwwwdwwwd']                    
+        #self.actions = [[''],['a'], ['a','a'],['a','a','a'],['d'], ['d','d'],['d','d','d']]
         self.actions = ['a', 'aa', 'aaa', 'd', 'dd' 'ddd', 'dddd', '',
                         'aw', 'aaw', 'aaaw', 'dw', 'ddw' 'dddw', 'ddddw' ]
         
