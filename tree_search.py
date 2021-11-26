@@ -43,11 +43,13 @@ class SearchProblem:
      # procurar a solucao
     def search(self, stateGame,limit = math.inf):
         all_possibilities = []
+        peçaOriginal = deepcopy(self.piece)
         for action in self.actions:
             #print("Peca ", self.piece)
-            new_piece = self.domain.result(action, deepcopy(self.piece))
+            new_piece = self.domain.result(action, peçaOriginal)
             #print("Nova peca apos a acao ", action, " : ", new_piece)
             all_possibilities.append((deepcopy(new_piece), action))
+            peçaOriginal = deepcopy(self.piece)
         #print("ALL POSSIBILITIES (TEM QUE DAR cois dif)")
         #for c in all_possibilities:
             #print(f"{c[0]}")

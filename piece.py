@@ -72,7 +72,7 @@ class Piece:
         x = int(x)
         y = int(y)
         positions_temp = [
-            (cx + x - self._x, cy + y - self._y) for cx, cy in self.positions
+            [cx + x - self._x, cy + y - self._y] for cx, cy in self.positions
         ]
 
         if self.chek_update(positions_temp):
@@ -84,7 +84,7 @@ class Piece:
     def rotate(self, step=1):
         self.rotation = (self.rotation + step) % len(self.plan)
         positions_temp = [
-            (self._x + x, self._y + y)
+            [self._x + x, self._y + y]
             for y, line in enumerate(self.plan[self.rotation])
             for x, pos in enumerate(line)
             if pos == "1"
