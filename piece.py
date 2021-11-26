@@ -88,6 +88,7 @@ class Piece:
             for y, line in enumerate(self.plan[self.rotation])
             for x, pos in enumerate(line)
             if pos == "1"
+            
         ]
 
         if self.chek_update(positions_temp):
