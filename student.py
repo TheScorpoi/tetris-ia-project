@@ -7,6 +7,7 @@ import os
 from piece import *
 
 import websockets
+import time
 
 
 class Student(SearchDomain):
@@ -14,16 +15,18 @@ class Student(SearchDomain):
         pass
     
     def result(self, actions, piece):
-        
+        #print("Actionsssssssss: " + actions)
         for action in actions:
+            #print("Action:          " + action)      
             if action == 'a':
                 piece.translate(-1,0)
             elif action == 'd':
                 piece.translate(1,0)
             elif action == 'w': 
-                piece.rotate()
-            elif action == 's':
-                piece.translate(0,1)
+                if piece.plan == O:
+                    pass
+                else:
+                    piece.rotate()
         return piece
         
                                      
@@ -63,6 +66,11 @@ class Student(SearchDomain):
                         positions_piece_bottom[c][1] = val
 
             future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
+            print()
+            print()
+            print("FUTURO E MAIS ALEM:      ", future_stateGame)
+            print()
+            print()
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
             #print("JOgo de agr" + str(stateGame))
@@ -71,18 +79,30 @@ class Student(SearchDomain):
 
             action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
             #print("Futuro jogo ", future_stateGame)
+            #print("Heuristica da acao ", piece_action[1], " = ", action_heuristic[piece_action[1]])
         
-        min_heuristic = ("a", action_heuristic["a"])
+        min_heuristic = -10000
+        action_to_do = " "
         for key in action_heuristic:
-            #print("Action: " ,key, " , heuristica " , action_heuristic[key])
-            if min_heuristic[1] < action_heuristic[key]:
-                min_heuristic = (key, action_heuristic[key])
+            print("Action: " ,key, " , heuristica " , action_heuristic[key])
+            if action_heuristic[key] > min_heuristic:
+                min_heuristic = action_heuristic[key]
+                action_to_do = key 
 
+        #print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
+        
+        return action_to_do
 
-        return min_heuristic[0]
 
     def aggregate_height(self, state):
         high_column = self.columns_height(state)
+        print()
+        print()
+        print()
+        print(high_column)
+        print()
+        print()
+        print()
         return sum(high_column)
 
     def bumpiness(self,state):
@@ -133,7 +153,7 @@ class Student(SearchDomain):
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):
         #return self.aggregate_height(state) + self.bumpiness(state) + self.holes(state) + self.completed_lines(state)
-        return (self.aggregate_height(state) * -0.510066) + (self.bumpiness(state) * -0.184483) + (self.holes(state)* -0.35663) + (self.completed_lines(state) * 0.760666)
+        return (self.aggregate_height(state) * -0.8) + (self.bumpiness(state) * -0.3) + (self.holes(state)* -0.4) + (self.completed_lines(state) * 1.0)
     
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
@@ -141,43 +161,33 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
 
-        first_time = True
         student = Student()
+        next_pieces = []
         while True:
             try:
                 state = json.loads(
-                    await websocket.recv()
-                )  # receive game update, this must be called timely or your game will get out of sync with the server
+                        await websocket.recv()
+                    ) 
+                if next_pieces != state.get("next_pieces"):
+                    next_pieces = state.get("next_pieces")
+                    # receive game update, this must be called timely or your game will get out of sync with the server
 
-                # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
-                #print("STATE ", state)
-                if state.get("piece") != None:
-                    if first_time == True: 
+                    # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
+                    print("STATE ", state)
+                    if state.get("piece") != None:
                         piece = Piece(state.get("piece"))
                         p = SearchProblem(student,piece)
-                    #   print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
+                        #print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
                         key = p.search(state)
-                        await websocket.send(
-                            json.dumps({"cmd": "key", "key": key})
-                        )  # send key command to server - you must implement this send in the AI agent
-                        first_time = False
-                    else:
-                        '''
-                        key = "s"
-                        await websocket.send(
-                            json.dumps({"cmd": "key", "key": key})
-                        )  # send key command to server - you must implement this send in the AI agent
-                        '''
-                        piece = Piece(state.get("piece"))
-                        p = SearchProblem(student,piece)
-                    #   print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
-                        key = p.search(state)
-                        await websocket.send(
-                            json.dumps({"cmd": "key", "key": key})
-                        )  # send key command to server - you must implement this send in the AI agent
-                        first_time = False
-                elif state.get("piece") == None:
-                    first_time = True
+                        #print("KEYYYY   : ", key)
+                        for action in key:
+                            await websocket.send(
+                                json.dumps({"cmd": "key", "key": action})
+                                
+                            )  # send key command to server - you must implement this send in the AI agent
+                            time.sleep(0.15)
+                            
+
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return
