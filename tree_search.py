@@ -73,16 +73,17 @@ class SearchProblem:
     def search(self, stateGame,limit = math.inf):
         all_possibilities = []
         peçaOriginal = deepcopy(self.piece)
-        print("--------------------INICIO----------------------------")
+        #print("--------------------INICIO----------------------------")
         for action in self.get_actions_by_shape(peçaOriginal):
-            print("Peca ", peçaOriginal)
+            #print("Peca ", peçaOriginal)
             new_piece = self.domain.result(action, peçaOriginal)
-            print("Nova peca apos a acao ", action, " : ", new_piece)
+            #print("Nova peca apos a acao ", action, " : ", new_piece)
             all_possibilities.append((deepcopy(new_piece), action))
             peçaOriginal = deepcopy(self.piece)
-        print("--------------------FIM----------------------------")
+        #print("--------------------FIM----------------------------")
         #print("ALL POSSIBILITIES (TEM QUE DAR cois dif)")
         #for c in all_possibilities:
             #print(f"{c[0]}")
         action = self.goal_test(all_possibilities, stateGame)
+        print("Retornei esta acao ", action)
         return action 
