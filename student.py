@@ -22,14 +22,15 @@ class Student(SearchDomain):
                 piece.translate(-1,0)
             elif action == 'd':
                 piece.translate(1,0)
-            elif action == 'w': 
+            elif action == 'w':
+                print("Peca sem rodar ", piece ) 
                 if piece.plan == O:
                     pass
                 else:
                     piece.rotate()
+                print("Peca dps de rodar ", piece ) 
         return piece
         
-                                     
     def satisfies(self, all_possibilities, stateGame):
         action_heuristic = {}
         for piece_action in all_possibilities:
@@ -41,7 +42,7 @@ class Student(SearchDomain):
                 positions_piece.append([deepcopy(pos)[0], deepcopy(pos)[1]])
                 abcissas_piece.append(pos[0])
 
-            miny_instateGame = 30
+            miny_instateGame = 30           #verificar 29 e 30!!!
             if stateGame["game"] != []:
                 for c in stateGame["game"]:
                     if miny_instateGame > c[1] and c[0] in abcissas_piece:
@@ -66,15 +67,16 @@ class Student(SearchDomain):
                         positions_piece_bottom[c][1] = val
 
             future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
-            #print()
-            #print("FUTURO E MAIS ALEM:      ", future_stateGame)
-            #print()
+            print()
+            print("FUTURO E MAIS ALEM:      ", future_stateGame)
+            print()
             
+            print("Acao que estamos a anlisar" , piece_action[1])
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
             #print("JOgo de agr" + str(stateGame))
-            #print("Peca de agr dps da acao", positions_piece)
-            #print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
+            print("Peca de agr dps da acao", positions_piece)
+            print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
 
             action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
             #print("Futuro jogo ", future_stateGame)
@@ -90,7 +92,7 @@ class Student(SearchDomain):
 
         print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
         
-        return action_to_do
+        return action_to_do + "s"
 
     def aggregate_height(self, state):
         high_column = self.columns_height(state)

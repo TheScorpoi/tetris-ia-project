@@ -41,58 +41,89 @@ T = [
 
 class Piece:
     lastPlan = None
+    lastPos = None
 
     def __init__(self, positions):
         self.positions = positions
         self.plan = None
+        self.index_plan = 1
         #print("positions rere", positions)
         if positions == [[4,2], [4,3], [5,3], [4,4] ]:
             self.plan = T
+            self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
         elif positions == [[4,2], [4,3], [4,4], [5,4] ]:
             self.plan = L
+            self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
         elif positions == [[3,3], [4,3], [3,4], [4,4] ]:
             self.plan = O
+            self._pos = [[0,0], [0, 0], [0, 0], [0, 0]]
         elif positions == [[4,2], [5,2], [4,3], [4,4] ]:
             self.plan = J
+            self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
         elif positions == [[4,2], [4,3], [5,3], [5,4] ]:
             self.plan = S
+            self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
         elif positions == [[2,2], [3,2], [4,2], [5,2] ]:
             self.plan = I
+            self._pos = [[2,5], [2, 1], [2, 1], [2, 1]]
         elif positions == [[4,2], [3,3], [4,3], [3,4] ]:
             self.plan = Z
+            self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
         else:
             self.plan = Piece.lastPlan
+            self._pos = [[2,5], [2, 1], [2, 1], [2, 1]]
         
         Piece.lastPlan = self.plan
-        self.rotation = 0
-        self._x = 0
-        self._y = 0
+        Piece.lastPos = self._pos
 
     def set_pos(self, x, y):
         x = int(x)
         y = int(y)
-        positions_temp = [
-            [cx + x - self._x, cy + y - self._y] for cx, cy in self.positions
+        self.positions = [
+            [cx + x , cy + y ] for cx, cy in self.positions
         ]
 
-        if self.chek_update(positions_temp):
-            self.positions = positions_temp
-            self._x = x
-            self._y = y
+        for index in range(len(self._pos)):
+            self._pos[index][0] = self._pos[index][0] + x 
+            self._pos[index][1] = self._pos[index][1] + y 
 
-
-    def rotate(self, step=1):
-        self.rotation = (self.rotation + step) % len(self.plan)
-        positions_temp = [
-            [self._x + x, self._y + y]
-            for y, line in enumerate(self.plan[self.rotation])
+        '''
+        if not self.chek_update(self.positions):
+            print("--------------ENTREI NO CHECK UPDATE COM TRANSLATE----------------------")
+        '''
+        
+    def rotate(self):
+        #self.rotation = (self.rotation + step) % len(self.plan)
+        self.update_plan()
+        self.positions = [
+            [x, y]
+            for y, line in enumerate(self.plan[self.index_plan])
             for x, pos in enumerate(line)
             if pos == "1"
-            
         ]
 
-        if self.chek_update(positions_temp):
-            self.positions = positions_temp
+        for index in range(len(self._pos)):
+            self.positions[index][0] = self.positions[index][0] + self._pos[index][0] 
+            self.positions[index][1] = self.positions[index][1] + self._pos[index][1] 
+
+
+
+        '''
+        if not self.chek_update(self.positions):
+            self.rotation = (self.rotation - 1) % len(self.plan)
+            self.positions = [
+                [self._x + x, self._y + y]
+                for y, line in enumerate(self.plan[self.rotation])
+                for x, pos in enumerate(line)
+                if pos == "1"
+            ]
+        '''
+
+    def update_plan(self):
+        self.index_plan += 1
+        if self.index_plan >= len(self.plan):
+            self.index_plan = 0
+
 
     def chek_update(self, positions_temp):
         flag = True 
@@ -104,7 +135,7 @@ class Piece:
         return flag
 
     def translate(self, x, y):
-        self.set_pos(self._x + x, self._y + y)
+        self.set_pos(x, y)
 
     @property
     def x(self):
@@ -123,4 +154,4 @@ class Piece:
         self.set_pos(self._x, y)
 
     def __str__(self) -> str:
-        return f"Shape({self._x},{self._y}) -> {self.positions} -> {self.plan}"
+        return f"Shape() -> {self.positions} -> {self.plan}"
