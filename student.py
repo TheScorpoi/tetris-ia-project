@@ -41,13 +41,13 @@ class Student(SearchDomain):
                 positions_piece.append([deepcopy(pos)[0], deepcopy(pos)[1]])
                 abcissas_piece.append(pos[0])
 
-            miny_instateGame = 29
+            miny_instateGame = 30
             if stateGame["game"] != []:
                 for c in stateGame["game"]:
                     if miny_instateGame > c[1] and c[0] in abcissas_piece:
                         miny_instateGame = c[1]
 
-            #print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE =)")
+            #print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE :)")
             #for c in all_possibilities:
                 #print(f"{c[0]}")
             #print("Deepcopy funciona fds, Peca de agr", positions_piece)
@@ -66,11 +66,10 @@ class Student(SearchDomain):
                         positions_piece_bottom[c][1] = val
 
             future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
-            print()
-            print()
-            print("FUTURO E MAIS ALEM:      ", future_stateGame)
-            print()
-            print()
+            #print()
+            #print("FUTURO E MAIS ALEM:      ", future_stateGame)
+            #print()
+            
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
             #print("JOgo de agr" + str(stateGame))
@@ -89,20 +88,12 @@ class Student(SearchDomain):
                 min_heuristic = action_heuristic[key]
                 action_to_do = key 
 
-        #print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
+        print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
         
         return action_to_do
 
-
     def aggregate_height(self, state):
         high_column = self.columns_height(state)
-        print()
-        print()
-        print()
-        print(high_column)
-        print()
-        print()
-        print()
         return sum(high_column)
 
     def bumpiness(self,state):
@@ -111,23 +102,20 @@ class Student(SearchDomain):
         for i in range(len(high_column) - 1):
             bumpiness += abs(high_column[i] - high_column[i+1])
         return bumpiness
-
+        
     def holes(self, state):
+        heights = self.columns_height(state)
         holes = 0
-        max_height = max(self.columns_height(state))
-        y = 30 - max_height
-        for coord in state:
-                if (y + 1) < 30:
-                    coord_below= [coord[0], y + 1]
-                    y += 1
-                    if coord_below not in state:
-                        holes += 1
+        for i in range(8):
+            for y in range(30 - heights[i], 30):
+                if [i + 1, y] not in state:
+                    holes += 1
         return holes
     
     def completed_lines(self, state):
         highest = max(self.columns_height(state))
         completed = 0
-        y = 30 - highest
+        y = 30 - highest    
         x = 1
         for _ in range(y * 8):     
             coord_tmp = [x , y]
@@ -144,16 +132,15 @@ class Student(SearchDomain):
     
     def columns_height(self, state):
         high_column = [0,0,0,0,0,0,0,0]
-        for coord in state:
-            if coord[0] <= 8 and coord[0] >= 0:
-                if high_column[coord[0] - 1] < (30 - coord[1]):
-                    high_column[coord[0] - 1] =  30 - coord[1]
+        for x, y in state:
+            if 30 - y > high_column[x - 1]:
+                high_column[x - 1] = 30 - y
         return high_column
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):
         #return self.aggregate_height(state) + self.bumpiness(state) + self.holes(state) + self.completed_lines(state)
-        return (self.aggregate_height(state) * -0.8) + (self.bumpiness(state) * -0.3) + (self.holes(state)* -0.4) + (self.completed_lines(state) * 1.0)
+        return (self.aggregate_height(state) * -0.510066) + (self.bumpiness(state) * -0.184483) + (self.holes(state)* -0.35663) + (self.completed_lines(state) * 0.760666)
     
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
@@ -173,7 +160,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # receive game update, this must be called timely or your game will get out of sync with the server
 
                     # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
-                    print("STATE ", state)
+                    #print("STATE ", state)
                     if state.get("piece") != None:
                         piece = Piece(state.get("piece"))
                         p = SearchProblem(student,piece)
@@ -185,7 +172,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 json.dumps({"cmd": "key", "key": action})
                                 
                             )  # send key command to server - you must implement this send in the AI agent
-                            time.sleep(0.15)
+                            time.sleep(0.125)
                             
 
             except websockets.exceptions.ConnectionClosedOK:
@@ -201,6 +188,3 @@ SERVER = os.environ.get("SERVER", "localhost")
 PORT = os.environ.get("PORT", "8000")
 NAME = os.environ.get("NAME", getpass.getuser())
 loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
-
-
-
