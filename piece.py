@@ -87,13 +87,7 @@ class Piece:
             self._pos[index][0] = self._pos[index][0] + x 
             self._pos[index][1] = self._pos[index][1] + y 
 
-        '''
-        if not self.chek_update(self.positions):
-            print("--------------ENTREI NO CHECK UPDATE COM TRANSLATE----------------------")
-        '''
-        
     def rotate(self):
-        #self.rotation = (self.rotation + step) % len(self.plan)
         self.update_plan()
         self.positions = [
             [x, y]
@@ -106,24 +100,10 @@ class Piece:
             self.positions[index][0] = self.positions[index][0] + self._pos[index][0] 
             self.positions[index][1] = self.positions[index][1] + self._pos[index][1] 
 
-
-
-        '''
-        if not self.chek_update(self.positions):
-            self.rotation = (self.rotation - 1) % len(self.plan)
-            self.positions = [
-                [self._x + x, self._y + y]
-                for y, line in enumerate(self.plan[self.rotation])
-                for x, pos in enumerate(line)
-                if pos == "1"
-            ]
-        '''
-
     def update_plan(self):
         self.index_plan += 1
         if self.index_plan >= len(self.plan):
             self.index_plan = 0
-
 
     def chek_update(self, positions_temp):
         flag = True 

@@ -173,17 +173,3 @@ class Shape:
         return self.__str__()
 
 SHAPES = [Shape(s) for s in [S, Z, I, O, J, T, L]]
-
-if __name__ == "__main__":
-    s = Shape(S)
-    #print(random.choice(SHAPES))
-    print(s)
-    s.rotate(0)
-    print(s)
-    s.rotate(3)
-    print(s)
-    s.rotate(2)
-    print(s)
-    s.rotate(4)
-    print(s)
-    #[4, 2], [5, 2], [4, 3], [4, 4]]
