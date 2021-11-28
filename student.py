@@ -70,6 +70,51 @@ class Student(SearchDomain):
                         positions_piece_bottom[c][1] = val
 
             future_stateGame = stateGame["game"] + positions_piece_bottom
+
+            proximas_pecas = stateGame['next_pieces']
+            if len(proximas_pecas) == 3:
+                new_game = {}
+                new_game['game'] = future_stateGame
+                new_game['piece'] = stateGame['next_pieces'][0]
+                new_game['next_pieces'] = stateGame['next_pieces'][1:]    
+  
+                all_pos = []    
+                peçaOriginal = deepcopy(Piece(proximas_pecas[0]))
+                for action in self.get_actions_by_shape(peçaOriginal):
+                    new_piece = self.result(action, peçaOriginal)
+                    all_pos.append((new_piece, action))
+                    peçaOriginal = deepcopy(proximas_pecas[0])
+                action = self.satisfies(all_pos, new_game)
+
+                new_game.put['game'] = new_game['game'] + [c[0].positions for c in all_pos if c[1] == action][0]
+                new_game.put['piece'] = stateGame['next_pieces'][1]
+                new_game.put['next_pieces'] = stateGame['next_pieces'][2:]
+  
+                all_pos = []    
+                peçaOriginal = deepcopy(proximas_pecas[1])
+                for action in self.get_actions_by_shape(peçaOriginal):
+                    new_piece = self.result(action, peçaOriginal)
+                    all_pos.append((new_piece, action))
+                    peçaOriginal = deepcopy(proximas_pecas[1])
+                action = self.satisfies(all_pos, new_game)
+
+                new_game.put['game'] = new_game['game'] + [c[0].positions for c in all_pos if c[1] == action][0]
+                new_game.put['piece'] = stateGame['next_pieces'][0]
+                new_game.put['next_pieces'] = stateGame['next_pieces'][3:]
+  
+                all_pos = []    
+                peçaOriginal = deepcopy(proximas_pecas[2])
+                for action in self.get_actions_by_shape(peçaOriginal):
+                    new_piece = self.result(action, peçaOriginal)
+                    all_pos.append((new_piece, action))
+                    peçaOriginal = deepcopy(proximas_pecas[2])
+                action = self.satisfies(all_pos, new_game)
+
+                action_heuristic[piece_action[1]] = self.heuristic(new_game['game'])
+            else:
+                action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
+
+
             #print()
             #print("FUTURO E MAIS ALEM:      ", future_stateGame)
             #print()
@@ -93,7 +138,36 @@ class Student(SearchDomain):
 
         #print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
         
-        return action_to_do + 's'
+        return action_to_do
+
+    def get_actions_by_shape(self, piece):
+        if piece == [[2, 1], [2, 2], [3, 2], [2, 3]]: #T
+            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
+                       'ww', 'wwaa', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
+                       'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
+        elif piece == [[2, 1], [2, 2], [2, 3], [3, 3]]:#L
+            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
+                       'ww', 'wwaa', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
+                       'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
+        elif piece == [[1, 2], [2, 2], [1, 3], [2, 3]]:#O
+            self.actions = ['', 'aa', 'dd', 'a', 'd', 'ddd', 'dddd']
+        elif piece == [[2, 1], [3, 1], [2, 2], [2, 3]]:#J
+            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
+                       'wwaa', 'ww', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
+                       'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
+        elif piece == [[2, 1], [2, 2], [3, 2], [3, 3]]:#S
+            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd']
+        elif piece == [[0, 1], [1, 1], [2, 1], [3, 1]]:#I
+            self.actions = ['', 'a', 'ddd', 'dd', 'd',
+                       'w', 'waaa', 'wdddd', 'wddd', 'waa',  'wa', 'wdd', 'wd'] #tiramos acoes 'waaa', 'waa'
+        elif piece == [[2, 1], [1, 2], [2, 2], [1, 3]]:#Z
+            self.actions = ['', 'aa', 'dddd', 'a', 'ddd', 'dd', 'd',
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd']
+        return self.actions  
 
     def aggregate_height(self, state):
         high_column = self.columns_height(state)
@@ -169,7 +243,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             piece = Piece(state.get("piece"))
                             p = SearchProblem(student,piece)
                             #print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
-                            key = p.search(state)
+                            key = p.search(state) + 's'
                             #print("Entrei pela 1 vez", key)
                             #print("KEYYYY   : ", key)
                             action = key[0]
