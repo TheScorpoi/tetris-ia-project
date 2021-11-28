@@ -75,42 +75,50 @@ class Student(SearchDomain):
             if len(proximas_pecas) == 3:
                 new_game = {}
                 new_game['game'] = future_stateGame
-                new_game['piece'] = stateGame['next_pieces'][0]
                 new_game['next_pieces'] = stateGame['next_pieces'][1:]    
   
                 all_pos = []    
-                peçaOriginal = deepcopy(Piece(proximas_pecas[0]))
+                peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[0]))
+                new_game['piece'] = peçaOriginal.positions
                 for action in self.get_actions_by_shape(peçaOriginal):
                     new_piece = self.result(action, peçaOriginal)
                     all_pos.append((new_piece, action))
-                    peçaOriginal = deepcopy(proximas_pecas[0])
+                    peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[0]))
+                print("Todas as possibilidades", all_pos)
+                print("ALL POSSIBILITIES ")
+                for c in all_pos:
+                    print(f"{c[0]}   , action : {c[1]}")
+                print("NOvo jogo", new_game)
                 action = self.satisfies(all_pos, new_game)
 
-                new_game.put['game'] = new_game['game'] + [c[0].positions for c in all_pos if c[1] == action][0]
-                new_game.put['piece'] = stateGame['next_pieces'][1]
-                new_game.put['next_pieces'] = stateGame['next_pieces'][2:]
-  
+                '''
+
+                new_game['game'] = new_game['game'] + [c[0].positions for c in all_pos if c[1] == action][0]
+                new_game['next_pieces'] = stateGame['next_pieces'][2:]
+
                 all_pos = []    
-                peçaOriginal = deepcopy(proximas_pecas[1])
+                peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[1]))
+                new_game['piece'] = peçaOriginal.positions
                 for action in self.get_actions_by_shape(peçaOriginal):
                     new_piece = self.result(action, peçaOriginal)
                     all_pos.append((new_piece, action))
-                    peçaOriginal = deepcopy(proximas_pecas[1])
+                    peçaOriginal = deepcopy(peçaOriginal)
                 action = self.satisfies(all_pos, new_game)
 
                 new_game.put['game'] = new_game['game'] + [c[0].positions for c in all_pos if c[1] == action][0]
-                new_game.put['piece'] = stateGame['next_pieces'][0]
                 new_game.put['next_pieces'] = stateGame['next_pieces'][3:]
   
                 all_pos = []    
-                peçaOriginal = deepcopy(proximas_pecas[2])
+                peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[2]))
+                new_game['piece'] = peçaOriginal.positions
                 for action in self.get_actions_by_shape(peçaOriginal):
                     new_piece = self.result(action, peçaOriginal)
                     all_pos.append((new_piece, action))
-                    peçaOriginal = deepcopy(proximas_pecas[2])
+                    peçaOriginal = deepcopy(peçaOriginal)
                 action = self.satisfies(all_pos, new_game)
+                '''
 
-                action_heuristic[piece_action[1]] = self.heuristic(new_game['game'])
+                action_heuristic[piece_action[1]] = self.heuristic(new_game['game'] + self.result(action,peçaOriginal).positions)
             else:
                 action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
 
@@ -141,33 +149,48 @@ class Student(SearchDomain):
         return action_to_do
 
     def get_actions_by_shape(self, piece):
-        if piece == [[2, 1], [2, 2], [3, 2], [2, 3]]: #T
-            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
+        if piece.positions == [[4,2], [4,3], [5,3], [4,4] ]: #T
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
                        'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
                        'ww', 'wwaa', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
                        'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
-        elif piece == [[2, 1], [2, 2], [2, 3], [3, 3]]:#L
-            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
+        elif piece.positions == [[4,2], [4,3], [4,4], [5,4] ]:#L
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
                        'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
                        'ww', 'wwaa', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
                        'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
-        elif piece == [[1, 2], [2, 2], [1, 3], [2, 3]]:#O
-            self.actions = ['', 'aa', 'dd', 'a', 'd', 'ddd', 'dddd']
-        elif piece == [[2, 1], [3, 1], [2, 2], [2, 3]]:#J
-            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
+        elif piece.positions == [[3,3], [4,3], [3,4], [4,4] ]:#O
+            return ['', 'aa', 'dd', 'a', 'd', 'ddd', 'dddd']
+        elif piece.positions == [[4,2], [5,2], [4,3], [4,4] ]:#J
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
                        'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
                        'wwaa', 'ww', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
                        'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
-        elif piece == [[2, 1], [2, 2], [3, 2], [3, 3]]:#S
-            self.actions = ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
+        elif piece.positions == [[4,2], [4,3], [5,3], [5,4] ]:#S
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
                        'w', 'waa', 'wddd', 'wa', 'wdd', 'wd']
-        elif piece == [[0, 1], [1, 1], [2, 1], [3, 1]]:#I
-            self.actions = ['', 'a', 'ddd', 'dd', 'd',
+        elif piece.positions == [[2,2], [3,2], [4,2], [5,2] ]:#I
+            return ['', 'a', 'ddd', 'dd', 'd',
                        'w', 'waaa', 'wdddd', 'wddd', 'waa',  'wa', 'wdd', 'wd'] #tiramos acoes 'waaa', 'waa'
-        elif piece == [[2, 1], [1, 2], [2, 2], [1, 3]]:#Z
-            self.actions = ['', 'aa', 'dddd', 'a', 'ddd', 'dd', 'd',
+        else:#Z
+            return ['', 'aa', 'dddd', 'a', 'ddd', 'dd', 'd',
                        'w', 'waa', 'wddd', 'wa', 'wdd', 'wd']
-        return self.actions  
+
+    def get_piece_by_shape(self, piece_positions):
+        if piece_positions == [[2, 1], [2, 2], [3, 2], [2, 3]]: #T
+            return Piece([[4,2], [4,3], [5,3], [4,4] ])
+        elif piece_positions == [[2, 1], [2, 2], [2, 3], [3, 3]]:#L
+            return Piece([[4,2], [4,3], [4,4], [5,4] ])
+        elif piece_positions == [[1, 2], [2, 2], [1, 3], [2, 3]]:#O
+            return Piece([[3,3], [4,3], [3,4], [4,4] ])
+        elif piece_positions == [[2, 1], [3, 1], [2, 2], [2, 3]]:#J
+            return Piece([[4,2], [5,2], [4,3], [4,4] ])
+        elif piece_positions == [[2, 1], [2, 2], [3, 2], [3, 3]]:#S
+            return Piece([[4,2], [4,3], [5,3], [5,4] ])
+        elif piece_positions == [[0, 1], [1, 1], [2, 1], [3, 1]]:#I
+            return Piece([[2,2], [3,2], [4,2], [5,2] ])
+        else:#Z
+            return Piece([[4,2], [3,3], [4,3], [3,4] ])
 
     def aggregate_height(self, state):
         high_column = self.columns_height(state)
