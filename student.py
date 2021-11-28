@@ -34,14 +34,14 @@ class Student(SearchDomain):
     def satisfies(self, all_possibilities, stateGame):
         action_heuristic = {}
         for piece_action in all_possibilities:
-            piece = deepcopy(piece_action[0])
+            piece = piece_action[0]
 
-            positions_piece = deepcopy([])
+            positions_piece = []
             for pos in piece.positions:
-                positions_piece.append([deepcopy(pos)[0], deepcopy(pos)[1]])
+                positions_piece.append([pos[0], pos[1]])
 
 
-            print("JOgo de agr" + str(stateGame))
+            #print("JOgo de agr" + str(stateGame))
 
             miny_instateGame = [30, 30, 30, 30, 30, 30, 30, 30]           #verificar 29 e 30!!!
             if stateGame["game"] != []:
@@ -49,14 +49,14 @@ class Student(SearchDomain):
                     if miny_instateGame[c[0] - 1] > c[1]:
                         miny_instateGame[c[0] - 1] = c[1]
 
-            print("MInimos y por cada coluna ", miny_instateGame)
+            #print("MInimos y por cada coluna ", miny_instateGame)
             #print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE :)")
             #for c in all_possibilities:
                 #print(f"{c[0]}")
             #print("Deepcopy funciona fds, Peca de agr", positions_piece)
 
-            print("Peca de agr dps da acao", positions_piece)
-            positions_piece_bottom = deepcopy(positions_piece)
+            #print("Peca de agr dps da acao", positions_piece)
+            positions_piece_bottom = positions_piece
             flag = True
             while flag:
 
@@ -69,15 +69,15 @@ class Student(SearchDomain):
                         val = positions_piece_bottom[c][1] + 1
                         positions_piece_bottom[c][1] = val
 
-            future_stateGame = deepcopy( stateGame["game"] + deepcopy(positions_piece_bottom))
-            print()
-            print("FUTURO E MAIS ALEM:      ", future_stateGame)
-            print()
+            future_stateGame = stateGame["game"] + positions_piece_bottom
+            #print()
+            #print("FUTURO E MAIS ALEM:      ", future_stateGame)
+            #print()
             
-            print("Acao que estamos a anlisar" , piece_action[1])
+            #print("Acao que estamos a anlisar" , piece_action[1])
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
 
-            print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
+            #print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
 
             action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
             #print("Futuro jogo ", future_stateGame)
@@ -143,7 +143,7 @@ class Student(SearchDomain):
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):
         #return self.aggregate_height(state) + self.bumpiness(state) + self.holes(state) + self.completed_lines(state)
-        return (self.aggregate_height(state) * -0.510066) + (self.bumpiness(state) * -0.184483) + (self.holes(state)* -0.35663) + (self.completed_lines(state) * 0.760666)
+        return (self.aggregate_height(state) * -0.510066) + (self.bumpiness(state) * -0.184483) + (self.holes(state)* -0.35663) + (self.completed_lines(state) * 0.555)
     
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
@@ -170,19 +170,19 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             p = SearchProblem(student,piece)
                             #print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
                             key = p.search(state)
-                            print("Entrei pela 1 vez", key)
+                            #print("Entrei pela 1 vez", key)
                             #print("KEYYYY   : ", key)
                             action = key[0]
-                            print("Vou enviar isto ", action)
+                            #print("Vou enviar isto ", action)
                             key = key[1:]
                             await websocket.send(
                                 json.dumps({"cmd": "key", "key": action})
                                 
                             )  # send key command to server - you must implement this send in the AI agent
                 else:
-                    print("Entrei ", key)
+                    #print("Entrei ", key)
                     action = key[0]
-                    print("Vou enviar isto ", action)
+                    #print("Vou enviar isto ", action)
                     key = key[1:]
                     await websocket.send(
                         json.dumps({"cmd": "key", "key": action})
