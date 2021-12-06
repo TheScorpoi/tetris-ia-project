@@ -84,11 +84,11 @@ class Student(SearchDomain):
                     new_piece = self.result(action, peçaOriginal)
                     all_pos.append((new_piece, action))
                     peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[0]))
-                print("Todas as possibilidades", all_pos)
-                print("ALL POSSIBILITIES ")
+                #print("Todas as possibilidades", all_pos)
+                #print("ALL POSSIBILITIES ")
                 for c in all_pos:
                     print(f"{c[0]}   , action : {c[1]}")
-                print("NOvo jogo", new_game)
+                #print("NOvo jogo", new_game)
                 action = self.satisfies(all_pos, new_game)
 
                 '''
@@ -117,10 +117,48 @@ class Student(SearchDomain):
                     peçaOriginal = deepcopy(peçaOriginal)
                 action = self.satisfies(all_pos, new_game)
                 '''
+                resultado = self.result(action,peçaOriginal).positions
 
-                action_heuristic[piece_action[1]] = self.heuristic(new_game['game'] + self.result(action,peçaOriginal).positions)
+                positions_result = []
+                for pos in resultado:
+                    positions_result.append([pos[0], pos[1]])
+
+
+                #print("JOgo de agr" + str(stateGame))
+
+                miny_instateGame2 = [30, 30, 30, 30, 30, 30, 30, 30]           #verificar 29 e 30!!!
+                if new_game['game'] != []:
+                    for c in new_game['game']:
+                        if miny_instateGame2[c[0] - 1] > c[1]:
+                            miny_instateGame2[c[0] - 1] = c[1]
+
+                #print("MInimos y por cada coluna ", miny_instateGame)
+                #print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE :)")
+                #for c in all_possibilities:
+                    #print(f"{c[0]}")
+                #print("Deepcopy funciona fds, Peca de agr", positions_piece)
+
+                #print("Peca de agr dps da acao", positions_piece)
+                positions_result_bottom = positions_result
+                flag = True
+                while flag:
+
+                    for c in range(len(positions_result)):
+                        if positions_result_bottom[c][1] + 1 >= miny_instateGame2[positions_result_bottom[c][0] - 1]:
+                            flag = False
+
+                    if flag:
+                        for c in range(len(positions_result)):
+                            val = positions_result_bottom[c][1] + 1
+                            positions_result_bottom[c][1] = val
+
+                print("PRIMEIRA PECA - Estado do jogo com as duas peças la em baixo, acao da primeira peça:",piece_action[1] ,", estado:", new_game['game'] + positions_result_bottom)
+                action_heuristic[piece_action[1]] = self.heuristic(new_game['game'] + positions_result_bottom)
+                print("Heuristica ", action_heuristic[piece_action[1]] )
             else:
+                print("SEGUNDA PECA - Estado do jogo com as duas peças la em baixo, acao da segunda peça:",piece_action[1] ,", estado:", future_stateGame)
                 action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
+                print("Heuristica ", action_heuristic[piece_action[1]] )
 
 
             #print()
@@ -132,7 +170,7 @@ class Student(SearchDomain):
 
             #print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
 
-            action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
+            #action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
             #print("Futuro jogo ", future_stateGame)
             #print("Heuristica da acao ", piece_action[1], " = ", action_heuristic[piece_action[1]])
         
