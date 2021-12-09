@@ -12,12 +12,12 @@ import time
 
 class Student(SearchDomain):
     def __init__(self):
-        self.dic = {}
+        self.action_to_do = ""
         pass
-
-    def empty_dic(self):
-        self.dic = {}
     
+    def update_action_to_do(self, action=""):
+        self.action_to_do = action
+
     def result(self, actions, piece):
         #print("Actionsssssssss: " + actions)
         for action in actions:
@@ -78,6 +78,7 @@ class Student(SearchDomain):
             proximas_pecas = stateGame['next_pieces']
             if len(proximas_pecas) == 3:
                 new_game = {}
+                dic = {}
                 new_game['game'] = future_stateGame
                 new_game['next_pieces'] = stateGame['next_pieces'][1:]    
   
@@ -86,14 +87,15 @@ class Student(SearchDomain):
                 new_game['piece'] = peçaOriginal.positions
                 for action in self.get_actions_by_shape(peçaOriginal):
                     new_piece = self.result(action, peçaOriginal)
-                    all_pos.append((new_piece, action))
+                    all_pos.append((new_piece, action + "s"))
                     peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[0]))
                 #print("Todas as possibilidades", all_pos)
                 #print("ALL POSSIBILITIES ")
-                #for c in all_pos:
-                #    print(f"{c[0]}   , action : {c[1]}")
+                for c in all_pos:
+                    print(f"{c[0]}   , action : {c[1]}")
                 #print("NOvo jogo", new_game)
                 action = self.satisfies(all_pos, new_game)
+                print("Devia ter a acao da segunda peca com s ", action)
 
                 '''
 
@@ -156,20 +158,19 @@ class Student(SearchDomain):
                             val = positions_result_bottom[c][1] + 1
                             positions_result_bottom[c][1] = val
 
-                #print("PRIMEIRA PECA - Estado do jogo com as duas peças la em baixo, acao da primeira peça:",piece_action[1] ,", estado:", new_game['game'] + positions_result_bottom)
+                print("PRIMEIRA PECA - Estado do jogo com as duas peças la em baixo, acao da primeira peça:",piece_action[1] ,", estado:", new_game['game'] + positions_result_bottom)
                 action_heuristic[piece_action[1]] = self.heuristic(new_game['game'] + positions_result_bottom)
-                #print("Heuristica ", action_heuristic[piece_action[1]] )
-                self.dic[piece_action[1]] = action
-                #print("Chave do dic, acao da primeira peca ", piece_action[1], "; Valor do dic, melhor acao da segunda peca com basa na chave ", self.dic[piece_action[1]]  )
+                print("Heuristica ", action_heuristic[piece_action[1]] )
+                dic[piece_action[1]] = action
             else:
-                #print("SEGUNDA PECA - Estado do jogo com as duas peças la em baixo, acao da segunda peça:",piece_action[1] ,", estado:", future_stateGame)
+                print("SEGUNDA PECA - Estado do jogo com as duas peças la em baixo, acao da segunda peça:",piece_action[1] ,", estado:", future_stateGame)
                 action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
-                #print("Heuristica ", action_heuristic[piece_action[1]] )
+                print("Heuristica ", action_heuristic[piece_action[1]] )
 
 
             #print()
             #print("FUTURO E MAIS ALEM:      ", future_stateGame)
-            #print()
+            #print()      action_to_do = " "
             
             #print("Acao que estamos a anlisar" , piece_action[1])
             #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
@@ -181,49 +182,49 @@ class Student(SearchDomain):
             #print("Heuristica da acao ", piece_action[1], " = ", action_heuristic[piece_action[1]])
         
         min_heuristic = -10000
-        action_to_do = " "
+        action_to_do_aux = ""
         for key in action_heuristic:
-            #print("Action: " ,key)
+            print("Action com c supostamente ", key)
+            #print("Action: " ,key, " , heuristica " , action_heuristic[key])
             if action_heuristic[key] > min_heuristic:
                 min_heuristic = action_heuristic[key]
-                action_to_do = key 
+                action_to_do_aux = key
 
         #print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
-        if len(stateGame['next_pieces']) == 3:
-            print("Chave do dic, acao da primeira peca ", action_to_do)
-            acao = action_to_do + " " + self.dic[action_to_do]
-            print("Acao da segunda peca ", self.dic[action_to_do])
-            return acao
-        
-        return action_to_do
+        if len(proximas_pecas) == 3:
+            self.update_action_to_do(dic[action_to_do_aux] + action_to_do_aux)
+        else:
+            self.update_action_to_do(action_to_do_aux)
+
+        return self.action_to_do
 
     def get_actions_by_shape(self, piece):
         if piece.positions == [[4,2], [4,3], [5,3], [4,4] ]: #T
-            return ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds',
-                       'ws', 'waas', 'wddds', 'was', 'wdds', 'wds',
-                       'wws', 'wwaas', 'wwdddds', 'wwas', 'wwddds', 'wwdds', 'wwds',
-                       'wwws', 'wwwaas', 'wwwddds', 'wwwas', 'wwwdds', 'wwwds']
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
+                       'ww', 'wwaa', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
+                       'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
         elif piece.positions == [[4,2], [4,3], [4,4], [5,4] ]:#L
-            return ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds', 
-                       'ws', 'waas', 'wddds', 'was', 'wdds', 'wds',
-                       'wws', 'wwaas', 'wwdddds', 'wwas', 'wwddds', 'wwdds', 'wwds',
-                       'wwws', 'wwwaas', 'wwwddds', 'wwwas', 'wwwdds', 'wwwds']
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
+                       'ww', 'wwaa', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
+                       'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
         elif piece.positions == [[3,3], [4,3], [3,4], [4,4] ]:#O
-            return ['s', 'aas', 'dds', 'as', 'ds', 'ddds', 'dddds']
+            return ['', 'aa', 'dd', 'a', 'd', 'ddd', 'dddd']
         elif piece.positions == [[4,2], [5,2], [4,3], [4,4] ]:#J
-            return ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds', 
-                       'ws', 'waas', 'wddds', 'was', 'wdds', 'wds',
-                       'wwaas', 'wws', 'wwdddds', 'wwas', 'wwddds', 'wwdds', 'wwds',
-                       'wwws', 'wwwaas', 'wwwddds', 'wwwas', 'wwwdds', 'wwwds']
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd', 
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd',
+                       'wwaa', 'ww', 'wwdddd', 'wwa', 'wwddd', 'wwdd', 'wwd',
+                       'www', 'wwwaa', 'wwwddd', 'wwwa', 'wwwdd', 'wwwd']
         elif piece.positions == [[4,2], [4,3], [5,3], [5,4] ]:#S
-            return ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds',
-                       'ws', 'waas', 'wddds', 'was', 'wdds', 'wds']
+            return ['', 'aaa', 'ddd', 'aa', 'dd', 'a', 'd',
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd']
         elif piece.positions == [[2,2], [3,2], [4,2], [5,2] ]:#I
-            return ['s', 'as', 'ddds', 'dds', 'ds',
-                       'ws', 'waaas', 'wdddds', 'wddds', 'waas',  'was', 'wdds', 'wds'] #tiramos acoes 'waaa', 'waa'
+            return ['', 'a', 'ddd', 'dd', 'd',
+                       'w', 'waaa', 'wdddd', 'wddd', 'waa',  'wa', 'wdd', 'wd'] #tiramos acoes 'waaa', 'waa'
         else:#Z
-            return ['s', 'aas', 'dddds', 'as', 'ddds', 'dds', 'ds',
-                       'ws', 'waas', 'wddds', 'was', 'wdds', 'wds']
+            return ['', 'aa', 'dddd', 'a', 'ddd', 'dd', 'd',
+                       'w', 'waa', 'wddd', 'wa', 'wdd', 'wd']
 
     def get_piece_by_shape(self, piece_positions):
         if piece_positions == [[2, 1], [2, 2], [3, 2], [2, 3]]: #T
@@ -300,56 +301,46 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         student = Student()
         next_pieces = []
         key = ''
-        peca_aux = []
-        game_aux = -1
         while True:
             try:
                 state = json.loads(
                     await websocket.recv()
                 ) 
-                print(state)
                 if len(key) == 0:
-                    #print("Peca aux ", peca_aux)
-                    #print("Peca que esta a cair ", state.get("piece"))
-                    #print("Tamanho do jogo aux  ", game_aux)
-                    if next_pieces != state.get("next_pieces") and state.get("game")!=None and ((len(state.get("game")) / 4) % 2) == 0:
-                        #print("Tamanho do jogo ", len(state.get("game")))
+                    if next_pieces != state.get("next_pieces"):
                         next_pieces = state.get("next_pieces")
-                        #print("NEXT PIECES ", next_pieces)
-                        peca_aux = next_pieces[0]   
-                        game_aux = len(state.get("game"))
                         # receive game update, this must be called timely or your game will get out of sync with the server
                         # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
                         #print("STATE ", state)
                         if state.get("piece") != None:
                             piece = Piece(state.get("piece"))
-                            student.empty_dic()
-                            #print("Dicionario devia estar vazio ",student.dic)
-                            print("PEca que esta a cair agr ", piece)
                             p = SearchProblem(student,piece)
                             #print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
+                            student.update_action_to_do("")
                             key = p.search(state)
+                            print("KEY antes do split ", key)
+                            keys = key.split("s")
+                            print("LISTA pos split ", keys)
+                            key = keys[1] + "s" + keys[0] + "s"
+                            print("KEY -> ", key)
                             #print("Entrei pela 1 vez", key)
-                            print("KEYYYY   : ", key)
+                            #print("KEYYYY   : ", key)
                             action = key[0]
-                            print("Vou enviar isto ", action)
+                            #print("Vou enviar isto ", action)
                             key = key[1:]
                             await websocket.send(
                                 json.dumps({"cmd": "key", "key": action})
                                 
                             )  # send key command to server - you must implement this send in the AI agent
-                            print("Estado do jogo dps de enviar a acao ", state)
                 else:
                     #print("Entrei ", key)
                     action = key[0]
-                    print("Vou enviar isto ", action)
-
+                    #print("Vou enviar isto ", action)
                     key = key[1:]
                     await websocket.send(
                         json.dumps({"cmd": "key", "key": action})
                         
                     )  # send key command to server - you must implement this send in the AI agent
-                    print("Estado do jogo dps de enviar a acao ", state)
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return
