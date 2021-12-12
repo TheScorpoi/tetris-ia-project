@@ -46,7 +46,6 @@ class Piece:
         self.positions = positions
         self.plan = None
         self.index_plan = 1
-        #print("positions rere", positions)
         if [[4,2], [4,3], [5,3], [4,4] ]  == positions:
             self.plan = T
             self.name = 'T'
@@ -83,8 +82,6 @@ class Piece:
         piece1_aux = deepcopy(piece1) 
         for incr in range(1, 28):
             piece1_aux = [(cx , cy + 1) for cx, cy in piece1_aux]
-            #print("Posicoes da piece 1", piece1.positions)
-            #print("Posicoes da piece 2", piece2.positions)
             if piece1_aux.sort() == piece2.sort():
                 return True
         return False
@@ -100,14 +97,8 @@ class Piece:
         for index in range(len(self._pos)):
             self._pos[index][0] = self._pos[index][0] + x 
             self._pos[index][1] = self._pos[index][1] + y 
-
-        '''
-        if not self.chek_update(self.positions):
-            print("--------------ENTREI NO CHECK UPDATE COM TRANSLATE----------------------")
-        '''
         
     def rotate(self):
-        #self.rotation = (self.rotation + step) % len(self.plan)
         self.update_plan()
         self.positions = [
             [x, y]
@@ -119,19 +110,6 @@ class Piece:
         for index in range(len(self._pos)):
             self.positions[index][0] = self.positions[index][0] + self._pos[index][0] 
             self.positions[index][1] = self.positions[index][1] + self._pos[index][1] 
-
-
-
-        '''
-        if not self.chek_update(self.positions):
-            self.rotation = (self.rotation - 1) % len(self.plan)
-            self.positions = [
-                [self._x + x, self._y + y]
-                for y, line in enumerate(self.plan[self.rotation])
-                for x, pos in enumerate(line)
-                if pos == "1"
-            ]
-        '''
 
     def update_plan(self):
         self.index_plan += 1
