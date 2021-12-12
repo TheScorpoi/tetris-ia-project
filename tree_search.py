@@ -32,8 +32,6 @@ class SearchProblem:
     def __init__(self, domain, piece, duration):
         self.domain = domain
         self.piece = piece
-        #self.actions = ['w', 'ww', 'www', 'wwwa', 'wwwaw', 'wwwaww', 'wwwawww', 'wwwawwwa', 'wwwawwww', 'wwwawwwwa', 'wwwawwwwaw', 'wwwawwwwaww', 'wwwawwwwawww','d', 'dw', 'dww', 'dwww', 'dwwwd', 'dwwwdw', 'dwwwdww', 'dwwwdwww', 'dwwwdwww', 'dwwwdwwwd']                    
-        #self.actions = [[''],['a'], ['a','a'],['a','a','a'],['d'], ['d','d'],['d','d','d']]
         self.actions = []
         self.duration = duration
         
@@ -72,10 +70,11 @@ class SearchProblem:
         return self.actions        
         
 
-     # procurar a solucao
+    # procurar a solucao
     def search(self, stateGame,limit = math.inf):
 
-        if self.piece.name == 'J' or self.piece.name == 'I' or self.piece.name == 'L':
+        #verificar se nas bordas do view deixa uma coluna vazia para a peca I
+        if self.piece.name == 'J' or self.piece.name == 'I' or self.piece.name == 'L': 
             high_column = [0,0,0,0,0,0,0,0]
             for x, y in stateGame["game"]:
                 if 30 - y > high_column[x - 1]:
@@ -83,8 +82,6 @@ class SearchProblem:
 
             firstColumn_heightRel = high_column[0] - high_column[1]
             lastColumn_heightRel = high_column[7] - high_column[6]
-            #print("firstColumn_heightRel ", firstColumn_heightRel)
-            #print("lastColumn_heightRel ", lastColumn_heightRel)
 
             if lastColumn_heightRel <=-4:
                 if self.piece.name == 'L' and [[0, 1], [1, 1], [2, 1], [3, 1]] not in stateGame["next_pieces"]:
@@ -97,20 +94,12 @@ class SearchProblem:
                 elif self.piece.name == 'I':
                     return 'waaas'
 
+        #Determinar todas as possibilidades
         all_possibilities = []
         peçaOriginal = deepcopy(self.piece)
-       #print("Peca ", peçaOriginal)
-        #print("--------------------INICIO----------------------------")
         for action in self.get_actions_by_shape(peçaOriginal):
-            #print("Peca ", peçaOriginal)
             new_piece = self.domain.result(action, peçaOriginal)
-            #print("Nova peca apos a acao ", action, " : ", new_piece)
             all_possibilities.append((new_piece, action ))
             peçaOriginal = deepcopy(self.piece)
-        #print("--------------------FIM----------------------------")
-       #print("ALL POSSIBILITIES antes do goal_test")
-        #for c in all_possibilities:
-           #print(f"{c[0]}")
         action = self.goal_test(all_possibilities, stateGame)
-        #print("Retornei esta acao ", action)
         return action 
