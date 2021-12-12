@@ -12,7 +12,7 @@ import time
 class Student(SearchDomain):
     def __init__(self):
         self.dic = {}
-        self.next_actions = []
+        self.next_actions = []  #proximas acoes, calculadas atraves do lookhead
 
     def empty_dic(self):
         self.dic = {}
@@ -23,34 +23,33 @@ class Student(SearchDomain):
     def is_empty_next_actions(self):
         return self.next_actions == []
     
-    def result(self, actions, piece):
-        #print("Actionsssssssss: " + actions)
+    def result(self, actions, piece): #Resultado da peca depois das acaos actions
         for action in actions:
-            #print("Action:          " + action)      
             if action == 'a':
                 piece.translate(-1,0)
             elif action == 'd':
                 piece.translate(1,0)
             elif action == 'w':
-                #print("Peca sem rodar ", piece ) 
                 if piece.plan == O:
                     pass
                 else:
                     piece.rotate()
-                #print("Peca dps de rodar ", piece ) 
         return piece
         
-    def satisfies(self, all_possibilities, stateGame, isWith_nextPieces):
+    def satisfies(self, all_possibilities, stateGame, isWith_nextPieces): # Resultado da melhor acao com base no estado do jogo 
         action_heuristic = {}
         for piece_action in all_possibilities:
             piece = piece_action[0]
-            positions_piece = piece.positions
-            miny_instateGame = [30, 30, 30, 30, 30, 30, 30, 30]           #verificar 29 e 30!!!
+            positions_piece = piece.positions #posicoes da peca sem a acao 's'
+
+            #Simular a peca lá em baixo:
+            miny_instateGame = [30, 30, 30, 30, 30, 30, 30, 30]          
             if stateGame["game"] != []:
                 for c in stateGame["game"]:
                     if miny_instateGame[c[0] - 1] > c[1]:
                         miny_instateGame[c[0] - 1] = c[1]
             positions_piece_bottom = positions_piece
+
             flag = True
             while flag:
                 for c in range(len(positions_piece)):
@@ -60,13 +59,16 @@ class Student(SearchDomain):
                     for c in range(len(positions_piece)):
                         val = positions_piece_bottom[c][1] + 1
                         positions_piece_bottom[c][1] = val
+
             future_stateGame = stateGame["game"] + positions_piece_bottom
+            
             proximas_pecas = stateGame['next_pieces']
-            if len(proximas_pecas) == 3 and isWith_nextPieces:
+            if len(proximas_pecas) == 3 and isWith_nextPieces: # Calcular as acoes das duas proximas pecas juntas
                 new_game = {}
                 new_game['game'] = future_stateGame
                 new_game['next_pieces'] = stateGame['next_pieces'][1:]    
 
+                #Calcular a melhor acao da segunda peca
                 all_pos = []    
                 peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[0]))
                 new_game['piece'] = peçaOriginal.positions
@@ -75,42 +77,17 @@ class Student(SearchDomain):
                     all_pos.append((new_piece, action))
                     peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[0]))
                 action = self.satisfies(all_pos, new_game, True)
-                '''
-                new_game['game'] = new_game['game'] + [c[0].positions for c in all_pos if c[1] == action][0]
-                new_game['next_pieces'] = stateGame['next_pieces'][2:]
-                all_pos = []    
-                peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[1]))
-                new_game['piece'] = peçaOriginal.positions
-                for action in self.get_actions_by_shape(peçaOriginal):
-                    new_piece = self.result(action, peçaOriginal)
-                    all_pos.append((new_piece, action))
-                    peçaOriginal = deepcopy(peçaOriginal)
-                action = self.satisfies(all_pos, new_game)
-                new_game.put['game'] = new_game['game'] + [c[0].positions for c in all_pos if c[1] == action][0]
-                new_game.put['next_pieces'] = stateGame['next_pieces'][3:]
 
-                all_pos = []    
-                peçaOriginal = deepcopy(self.get_piece_by_shape(proximas_pecas[2]))
-                new_game['piece'] = peçaOriginal.positions
-                for action in self.get_actions_by_shape(peçaOriginal):
-                    new_piece = self.result(action, peçaOriginal)
-                    all_pos.append((new_piece, action))
-                    peçaOriginal = deepcopy(peçaOriginal)
-                action = self.satisfies(all_pos, new_game)
-                '''
                 positions_result = self.result(action,peçaOriginal).positions
-                miny_instateGame2 = [30, 30, 30, 30, 30, 30, 30, 30]           #verificar 29 e 30!!!
+                
+                #Simular a segunda peca lá em baixo:
+                miny_instateGame2 = [30, 30, 30, 30, 30, 30, 30, 30]          
                 if new_game['game'] != []:
                     for c in new_game['game']:
                         if miny_instateGame2[c[0] - 1] > c[1]:
                             miny_instateGame2[c[0] - 1] = c[1]
-                #print("MInimos y por cada coluna ", miny_instateGame)
-                #print("ALL POSSIBILITIES (TEM QUE DAR SEMPRE :)")
-                #for c in all_possibilities:
-                    #print(f"{c[0]}")
-                #print("Deepcopy funciona fds, Peca de agr", positions_piece)
-                #print("Peca de agr dps da acao", positions_piece)
                 positions_result_bottom = positions_result
+
                 flag = True
                 while flag:
                     for c in range(len(positions_result)):
@@ -120,46 +97,27 @@ class Student(SearchDomain):
                         for c in range(len(positions_result)):
                             val = positions_result_bottom[c][1] + 1
                             positions_result_bottom[c][1] = val
-               #print("PRIMEIRA PECA - Estado do jogo com as duas peças la em baixo, acao da primeira peça:",piece_action[1] ,", estado:", new_game['game'] + positions_result_bottom)
+                #Calcular a heuristica das acoes da primeira peca e segunda, guardar num dicionario com chave a acao da primeira peca
                 action_heuristic[piece_action[1]] = self.heuristic(new_game['game'] + positions_result_bottom)
-               #print("Heuristica ", action_heuristic[piece_action[1]] )
+                #Guardar a acao da segunda peca num dicionario com chave a primeira peca
                 self.dic[piece_action[1]] = action
-               #print("Chave do dic, acao da primeira peca ", piece_action[1], "; Valor do dic, melhor acao da segunda peca com basa na chave ", self.dic[piece_action[1]]  )
             else:
-               #print("SEGUNDA PECA - Estado do jogo com as duas peças la em baixo, acao da segunda peça:",piece_action[1] ,", estado:", future_stateGame)
+                #Calcular a heuristica 
                 action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
-               #print("Heuristica ", action_heuristic[piece_action[1]] )
-            #print()
-            #print("FUTURO E MAIS ALEM:      ", future_stateGame)
-            #print()
-            
-            #print("Acao que estamos a anlisar" , piece_action[1])
-            #future_stateGame = deepcopy( stateGame["game"] + positions_piece) 
-            #print("Peça de agr dps da acao em baixo ", positions_piece_bottom)
-            #action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
-            #print("Futuro jogo ", future_stateGame)
-            #print("Heuristica da acao ", piece_action[1], " = ", action_heuristic[piece_action[1]])
         
+        #Calcular a melhor heuristica e guardar a acao respetiva
         min_heuristic = -10000
         action_to_do = 's'
         for key in action_heuristic:
-            #print("Action: " ,key)
             if action_heuristic[key] > min_heuristic:
-                #print("Entrei, n devia dar keyError")
                 min_heuristic = action_heuristic[key]
                 action_to_do = key 
         
-        #print("ALL POSSIBILITIES :")
-        #for c in all_possibilities:
-        #    print(f"{c[0]}")
-        #print("AQUIIIII:        ", action_to_do, " HEURISTICA ", min_heuristic)
         if len(stateGame['next_pieces']) == 3 and isWith_nextPieces:
-            #print("Chave do dic, acao da primeira peca ", action_to_do)
-            #acao = action_to_do + " " + self.dic[action_to_do]
+            #Caso seja analisado o lookhead, guardar a acao da segunda peca na lista das proximas acoes
             self.next_actions.append(self.dic[action_to_do])
-            #print("Acao da segunda peca ", self.dic[action_to_do])
         
-        return action_to_do
+        return action_to_do # returnar a melhor acao
 
     def get_actions_by_shape(self, piece):
         if piece.positions == [[4,2], [4,3], [5,3], [4,4] ]: #T
@@ -252,7 +210,6 @@ class Student(SearchDomain):
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):
-        #return self.aggregate_height(state) + self.bumpiness(state) + self.holes(state) + self.completed_lines(state)
         return (self.aggregate_height(state) * -0.510066) + (self.bumpiness(state) * -0.184483) + (self.holes(state)* -0.35663) + (self.completed_lines(state) * 0.760666)
     
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
@@ -262,87 +219,53 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
 
         student = Student()
-        jogo = []
-        next_pieces = []
-        key = ''
-        flag_firstTime = True
-        duration = 0
+        jogo = [] #ultimo state.get("game") analisado
+        next_pieces = [] #ultimo next_pieces analisado
+        key = ''    #acoes que a search retorna 
+        flag_firstTime = True 
+        duration = 0    #maxima duracao da search com lookhead implementada
         flag = True
         while True:
             try:
                 state = json.loads(
                     await websocket.recv()
                 ) 
-               #print(state)
-                if len(key) == 0:
-                    #print("Peca aux ", peca_aux)
-                    #print("Peca que esta a cair ", state.get("piece"))
-                    #print("Tamanho do jogo aux  ", game_aux)
-                    if (jogo != state.get("game") and next_pieces != state.get("next_pieces") ) or flag_firstTime:
-                        #print("Tamanho do jogo ", len(state.get("game")))
-                        #print("NEXT PIECES ", next_pieces)
-                        #second_piece = next_pieces[0]   
-                        #game_aux = len(state.get("game"))
-                        # receive game update, this must be called timely or your game will get out of sync with the server
-                        # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
-                        #print("STATE ", state)
-                        if state.get("piece") != None:
+
+                if len(key) == 0: # Chmar a search quando n tivermos mais acoes para enviar
+                    if (jogo != state.get("game") and next_pieces != state.get("next_pieces") ) or flag_firstTime: #verifcar se a ultima peca analisada já realizou as acoes
+                        if state.get("piece") != None:  
                             jogo = state.get("game")
                             next_pieces = state.get("next_pieces")
-                            if student.is_empty_next_actions():
+                            if student.is_empty_next_actions(): #verificar se ja determinamos as proximas acoes
                                 piece = Piece(state.get("piece"))
-                                if piece.plan != None:
-                                    student.empty_dic()
-                                    #print("Dicionario devia estar vazio ",student.dic)
-                                    #print("PEca que esta a cair agr ", piece)
+                                if piece.plan != None:  #verificar se identificamos bem a peca
+                                    student.empty_dic() #limpar variaveis do student para a nova pesquisa
                                     p = SearchProblem(student,piece, duration)
-                                    #print("PECA NO STUDENT QUE ESTA A CAIR ", piece.plan )
                                     inicio = time.time()
                                     key = p.search(state)
-                                    if time.time() - inicio > duration:
+                                    if time.time() - inicio > duration: #atualiazar a maxima duracao da implementacao do lookhead
                                         duration = time.time() - inicio
-                                   #print("Demorei ", duration)
-                                    #print("Entrei pela 1 vez", key)
-                                   #print("KEYYYY   : ", key)
-                                    #action = key[0]
-                                    #print("Vou enviar isto ", action)
-                                    #key = key[1:]
-                                    #if action == "s":
-                                    #    flag_lastActionis_s = True
-                                    #else:
-                                    #    flag_lastActionis_s = False
-                                    #await websocket.send(
-                                    #    json.dumps({"cmd": "key", "key": action})
-                                    #)  # send key command to server - you must implement this send in the AI agent
                             else:
-                                key = student.next_actions[0]
-                                student.empty_next_actions()
+                                key = student.next_actions[0]  #obter a proxima acao, determinada pelo lookhead
+                                student.empty_next_actions()   #limpar as proximas acoes
                             flag_firstTime = False
                 else:
-                    #print("Proximas pecas guardadas ", next_pieces)
-                    #print("Proximas pecas de agr ", state.get("next_pieces"))
-                    #print("Entrei ", key)
+                    action = key[0] #obter a proxima acao
+                    key = key[1:]   
 
-                    #print("Posicoes que devia ter ", piece_aux.positions)
-                    #print("Posicoes que tem ", state.get("piece"))
-                    action = key[0]
-                   #print("Vou enviar isto ", action)
-                    key = key[1:]
-                   #print("Jogo ", jogo)
-
-                    if duration > 0.2 and not flag:
+                    if duration > 0.2 and not flag: #Enviar para o server sem a implementacao do lookhead
                         await websocket.send(
                             json.dumps({"cmd": "key", "key": action})
                         )  # send key command to server - you must implement this send in the AI agent
-                    else:
+                    else: #Enviar para o server com a implementacao do lookhead
                         state = json.loads(
                             await websocket.recv()
                         ) 
-                        if jogo == state.get("game") and next_pieces == state.get("next_pieces"):
+                        if jogo == state.get("game") and next_pieces == state.get("next_pieces"): #verificar se a peca ainda n caiu 
                             await websocket.send(
                                 json.dumps({"cmd": "key", "key": action})
                             )  # send key command to server - you must implement this send in the AI agent
-                        else:
+                        else:   #se a peca ja caiu descartar as acoes guardadas
                             key = ''
                             student.empty_next_actions()
                         if duration > 0.2:
