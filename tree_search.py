@@ -74,9 +74,32 @@ class SearchProblem:
 
      # procurar a solucao
     def search(self, stateGame,limit = math.inf):
+
+        if self.piece.name == 'J' or self.piece.name == 'I' or self.piece.name == 'L':
+            high_column = [0,0,0,0,0,0,0,0]
+            for x, y in stateGame["game"]:
+                if 30 - y > high_column[x - 1]:
+                    high_column[x - 1] = 30 - y
+
+            firstColumn_heightRel = high_column[0] - high_column[1]
+            lastColumn_heightRel = high_column[7] - high_column[6]
+            #print("firstColumn_heightRel ", firstColumn_heightRel)
+            #print("lastColumn_heightRel ", lastColumn_heightRel)
+
+            if lastColumn_heightRel <=-4:
+                if self.piece.name == 'L' and [[0, 1], [1, 1], [2, 1], [3, 1]] not in stateGame["next_pieces"]:
+                    return 'wwdddds'
+                elif self.piece.name == 'I':
+                    return 'wdddds'
+            elif firstColumn_heightRel <=-4:
+                if self.piece.name == 'J'and [[0, 1], [1, 1], [2, 1], [3, 1]] not in stateGame["next_pieces"]:
+                    return 'aaas'
+                elif self.piece.name == 'I':
+                    return 'waaas'
+
         all_possibilities = []
         peçaOriginal = deepcopy(self.piece)
-        print("Peca ", peçaOriginal)
+       #print("Peca ", peçaOriginal)
         #print("--------------------INICIO----------------------------")
         for action in self.get_actions_by_shape(peçaOriginal):
             #print("Peca ", peçaOriginal)
@@ -85,9 +108,9 @@ class SearchProblem:
             all_possibilities.append((new_piece, action ))
             peçaOriginal = deepcopy(self.piece)
         #print("--------------------FIM----------------------------")
-        print("ALL POSSIBILITIES antes do goal_test")
-        for c in all_possibilities:
-            print(f"{c[0]}")
+       #print("ALL POSSIBILITIES antes do goal_test")
+        #for c in all_possibilities:
+           #print(f"{c[0]}")
         action = self.goal_test(all_possibilities, stateGame)
         #print("Retornei esta acao ", action)
         return action 

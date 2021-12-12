@@ -120,15 +120,15 @@ class Student(SearchDomain):
                         for c in range(len(positions_result)):
                             val = positions_result_bottom[c][1] + 1
                             positions_result_bottom[c][1] = val
-                print("PRIMEIRA PECA - Estado do jogo com as duas peças la em baixo, acao da primeira peça:",piece_action[1] ,", estado:", new_game['game'] + positions_result_bottom)
+               #print("PRIMEIRA PECA - Estado do jogo com as duas peças la em baixo, acao da primeira peça:",piece_action[1] ,", estado:", new_game['game'] + positions_result_bottom)
                 action_heuristic[piece_action[1]] = self.heuristic(new_game['game'] + positions_result_bottom)
-                print("Heuristica ", action_heuristic[piece_action[1]] )
+               #print("Heuristica ", action_heuristic[piece_action[1]] )
                 self.dic[piece_action[1]] = action
-                print("Chave do dic, acao da primeira peca ", piece_action[1], "; Valor do dic, melhor acao da segunda peca com basa na chave ", self.dic[piece_action[1]]  )
+               #print("Chave do dic, acao da primeira peca ", piece_action[1], "; Valor do dic, melhor acao da segunda peca com basa na chave ", self.dic[piece_action[1]]  )
             else:
-                print("SEGUNDA PECA - Estado do jogo com as duas peças la em baixo, acao da segunda peça:",piece_action[1] ,", estado:", future_stateGame)
+               #print("SEGUNDA PECA - Estado do jogo com as duas peças la em baixo, acao da segunda peça:",piece_action[1] ,", estado:", future_stateGame)
                 action_heuristic[piece_action[1]] = self.heuristic(future_stateGame)
-                print("Heuristica ", action_heuristic[piece_action[1]] )
+               #print("Heuristica ", action_heuristic[piece_action[1]] )
             #print()
             #print("FUTURO E MAIS ALEM:      ", future_stateGame)
             #print()
@@ -253,7 +253,7 @@ class Student(SearchDomain):
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):
         #return self.aggregate_height(state) + self.bumpiness(state) + self.holes(state) + self.completed_lines(state)
-        return (self.aggregate_height(state) * -0.510066) + (self.bumpiness(state) * -0.184483) + (self.holes(state)* -0.20505) + (self.completed_lines(state) * 0.760666)
+        return (self.aggregate_height(state) * -0.510066) + (self.bumpiness(state) * -0.184483) + (self.holes(state)* -0.35663) + (self.completed_lines(state) * 0.760666)
     
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
@@ -273,7 +273,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 state = json.loads(
                     await websocket.recv()
                 ) 
-                print(state)
+               #print(state)
                 if len(key) == 0:
                     #print("Peca aux ", peca_aux)
                     #print("Peca que esta a cair ", state.get("piece"))
@@ -301,9 +301,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                     key = p.search(state)
                                     if time.time() - inicio > duration:
                                         duration = time.time() - inicio
-                                    print("Demorei ", duration)
+                                   #print("Demorei ", duration)
                                     #print("Entrei pela 1 vez", key)
-                                    print("KEYYYY   : ", key)
+                                   #print("KEYYYY   : ", key)
                                     #action = key[0]
                                     #print("Vou enviar isto ", action)
                                     #key = key[1:]
@@ -326,9 +326,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     #print("Posicoes que devia ter ", piece_aux.positions)
                     #print("Posicoes que tem ", state.get("piece"))
                     action = key[0]
-                    print("Vou enviar isto ", action)
+                   #print("Vou enviar isto ", action)
                     key = key[1:]
-                    print("Jogo ", jogo)
+                   #print("Jogo ", jogo)
 
                     if duration > 0.2 and not flag:
                         await websocket.send(
