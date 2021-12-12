@@ -41,47 +41,57 @@ T = [
 ]
 
 class Piece:
+    lastPlan = None
+    lastPos = None
+    lastName = ''
 
     def __init__(self, positions):
         self.positions = positions
         self.plan = None
         self.index_plan = 1
         #print("positions rere", positions)
-        if [[4,2], [4,3], [5,3], [4,4] ]  == positions:
+        if self.verify([[4,2], [4,3], [5,3], [4,4] ], positions):
             self.plan = T
             self.name = 'T'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif [[4,2], [4,3], [4,4], [5,4] ]  == positions:
+        elif self.verify([[4,2], [4,3], [4,4], [5,4] ], positions):
             self.plan = L
             self.name = 'L'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif [[3,3], [4,3], [3,4], [4,4] ]  == positions:
+        elif self.verify([[3,3], [4,3], [3,4], [4,4] ], positions):
             self.plan = O
             self.name = 'O'
             self._pos = [[0,0], [0, 0], [0, 0], [0, 0]]
-        elif [[4,2], [5,2], [4,3], [4,4] ]  == positions:
+        elif self.verify([[4,2], [5,2], [4,3], [4,4] ], positions):
             self.plan = J
             self.name = 'J'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif [[4,2], [4,3], [5,3], [5,4] ]  == positions:
+        elif self.verify([[4,2], [4,3], [5,3], [5,4] ], positions):
             self.plan = S
             self.name = 'S'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif [[2,2], [3,2], [4,2], [5,2] ]  == positions:
+        elif self.verify([[2,2], [3,2], [4,2], [5,2] ], positions):
             self.plan = I
             self.name = 'I'
             self._pos = [[2,5], [2, 1], [2, 1], [2, 1]]
-        elif [[4,2], [3,3], [4,3], [3,4] ]  == positions:
+        elif self.verify([[4,2], [3,3], [4,3], [3,4] ], positions):
             self.plan = Z
             self.name = 'Z'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-            
+        else:
+            self.plan = Piece.lastPlan
+            self.name = Piece.lastName
+            self._pos = [[2,5], [2, 1], [2, 1], [2, 1]]
         
+        Piece.lastPlan = self.plan
+        Piece.lastPos = self._pos
+        Piece.lastName = self.lastName
+
     def verify(self, piece1, piece2):
         if piece1.sort() == piece2.sort():
             return True
         piece1_aux = deepcopy(piece1) 
-        for incr in range(1, 28):
+        for incr in range(1, 29):
             piece1_aux = [(cx , cy + 1) for cx, cy in piece1_aux]
             #print("Posicoes da piece 1", piece1.positions)
             #print("Posicoes da piece 2", piece2.positions)

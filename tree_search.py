@@ -29,41 +29,44 @@ class SearchDomain(ABC):
 # Problemas concretos a resolver
 # dentro de um determinado dominio
 class SearchProblem:
-    def __init__(self, domain, piece):
+    def __init__(self, domain, piece, duration):
         self.domain = domain
         self.piece = piece
         #self.actions = ['w', 'ww', 'www', 'wwwa', 'wwwaw', 'wwwaww', 'wwwawww', 'wwwawwwa', 'wwwawwww', 'wwwawwwwa', 'wwwawwwwaw', 'wwwawwwwaww', 'wwwawwwwawww','d', 'dw', 'dww', 'dwww', 'dwwwd', 'dwwwdw', 'dwwwdww', 'dwwwdwww', 'dwwwdwww', 'dwwwdwwwd']                    
         #self.actions = [[''],['a'], ['a','a'],['a','a','a'],['d'], ['d','d'],['d','d','d']]
         self.actions = []
+        self.duration = duration
         
     def goal_test(self, all_possibilities, stateGame):
-        return self.domain.satisfies(all_possibilities, stateGame)
-    
+        if self.duration > 0.2:
+            return self.domain.satisfies(all_possibilities, stateGame, False)
+        return self.domain.satisfies(all_possibilities, stateGame, True)
+
     def get_actions_by_shape(self, piece):
-        if piece.positions == [[4,2], [4,3], [5,3], [4,4] ]: #T
+        if piece.name == 'T':
             self.actions = ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds',
                        'ws', 'waas', 'wddds', 'was', 'wdds', 'wds',
                        'wws', 'wwaas', 'wwdddds', 'wwas', 'wwddds', 'wwdds', 'wwds',
                        'wwws', 'wwwaas', 'wwwddds', 'wwwas', 'wwwdds', 'wwwds']
-        elif piece.positions == [[4,2], [4,3], [4,4], [5,4] ]:#L
+        elif piece.name == 'L':
             self.actions = ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds', 
                        'ws', 'waas', 'wddds', 'was', 'wdds', 'wds',
                        'wws', 'wwaas', 'wwdddds', 'wwas', 'wwddds', 'wwdds', 'wwds',
                        'wwws', 'wwwaas', 'wwwddds', 'wwwas', 'wwwdds', 'wwwds']
-        elif piece.positions == [[3,3], [4,3], [3,4], [4,4] ]:#O
+        elif piece.name == 'O':
             self.actions = ['s', 'aas', 'dds', 'as', 'ds', 'ddds', 'dddds']
-        elif piece.positions == [[4,2], [5,2], [4,3], [4,4] ]:#J
+        elif piece.name == 'J':
             self.actions = ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds', 
                        'ws', 'waas', 'wddds', 'was', 'wdds', 'wds',
                        'wwaas', 'wws', 'wwdddds', 'wwas', 'wwddds', 'wwdds', 'wwds',
                        'wwws', 'wwwaas', 'wwwddds', 'wwwas', 'wwwdds', 'wwwds']
-        elif piece.positions == [[4,2], [4,3], [5,3], [5,4] ]:#S
+        elif piece.name == 'S':
             self.actions = ['s', 'aaas', 'ddds', 'aas', 'dds', 'as', 'ds',
                        'ws', 'waas', 'wddds', 'was', 'wdds', 'wds']
-        elif piece.positions == [[2,2], [3,2], [4,2], [5,2] ]:#I
+        elif piece.name == 'I':
             self.actions = ['s', 'as', 'ddds', 'dds', 'ds',
                        'ws', 'waaas', 'wdddds', 'wddds', 'waas',  'was', 'wdds', 'wds'] #tiramos acoes 'waaa', 'waa'
-        elif piece.positions == [[4,2], [3,3], [4,3], [3,4] ]:#Z
+        elif piece.name == 'Z':
             self.actions = ['s', 'aas', 'dddds', 'as', 'ddds', 'dds', 'ds',
                        'ws', 'waas', 'wddds', 'was', 'wdds', 'wds']
         return self.actions        
