@@ -97,7 +97,6 @@ class Piece:
         for index in range(len(self._pos)):
             self._pos[index][0] = self._pos[index][0] + x 
             self._pos[index][1] = self._pos[index][1] + y 
-        
     def rotate(self):
         self.update_plan()
         self.positions = [
@@ -115,7 +114,6 @@ class Piece:
         self.index_plan += 1
         if self.index_plan >= len(self.plan):
             self.index_plan = 0
-
 
     def chek_update(self, positions_temp):
         flag = True 

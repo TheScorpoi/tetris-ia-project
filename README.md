@@ -39,5 +39,3 @@ python -m pygame.examples.aliens
 - git remote add upstream https://github.com/dgomes/ia-tetris
 - git fetch upstream
 - git merge upstream/main --allow-unrelated-histories
-
-https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/

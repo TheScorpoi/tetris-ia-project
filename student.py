@@ -207,6 +207,7 @@ class Student(SearchDomain):
             if 30 - y > high_column[x - 1]:
                 high_column[x - 1] = 30 - y
         return high_column
+        
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state):

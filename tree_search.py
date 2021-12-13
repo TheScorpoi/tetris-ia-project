@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 import math
-import time
 
 class SearchDomain(ABC):
 
