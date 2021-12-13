@@ -1,3 +1,4 @@
+from copy import deepcopy
 from shape import SHAPES, Shape
 
 S = [
@@ -40,41 +41,51 @@ T = [
 ]
 
 class Piece:
-    lastPlan = None
-    lastPos = None
 
     def __init__(self, positions):
         self.positions = positions
         self.plan = None
         self.index_plan = 1
-        #print("positions rere", positions)
-        if positions == [[4,2], [4,3], [5,3], [4,4] ]:
+        if [[4,2], [4,3], [5,3], [4,4] ]  == positions:
             self.plan = T
+            self.name = 'T'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif positions == [[4,2], [4,3], [4,4], [5,4] ]:
+        elif [[4,2], [4,3], [4,4], [5,4] ]  == positions:
             self.plan = L
+            self.name = 'L'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif positions == [[3,3], [4,3], [3,4], [4,4] ]:
+        elif [[3,3], [4,3], [3,4], [4,4] ]  == positions:
             self.plan = O
+            self.name = 'O'
             self._pos = [[0,0], [0, 0], [0, 0], [0, 0]]
-        elif positions == [[4,2], [5,2], [4,3], [4,4] ]:
+        elif [[4,2], [5,2], [4,3], [4,4] ]  == positions:
             self.plan = J
+            self.name = 'J'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif positions == [[4,2], [4,3], [5,3], [5,4] ]:
+        elif [[4,2], [4,3], [5,3], [5,4] ]  == positions:
             self.plan = S
+            self.name = 'S'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        elif positions == [[2,2], [3,2], [4,2], [5,2] ]:
+        elif [[2,2], [3,2], [4,2], [5,2] ]  == positions:
             self.plan = I
+            self.name = 'I'
             self._pos = [[2,5], [2, 1], [2, 1], [2, 1]]
-        elif positions == [[4,2], [3,3], [4,3], [3,4] ]:
+        elif [[4,2], [3,3], [4,3], [3,4] ]  == positions:
             self.plan = Z
+            self.name = 'Z'
             self._pos = [[2,1], [2, 1], [2, 1], [2, 1]]
-        else:
-            self.plan = Piece.lastPlan
-            self._pos = [[2,5], [2, 1], [2, 1], [2, 1]]
+            
         
-        Piece.lastPlan = self.plan
-        Piece.lastPos = self._pos
+    def verify(self, piece1, piece2):
+        if piece1.sort() == piece2.sort():
+            return True
+        piece1_aux = deepcopy(piece1) 
+        for incr in range(1, 28):
+            piece1_aux = [(cx , cy + 1) for cx, cy in piece1_aux]
+            if piece1_aux.sort() == piece2.sort():
+                return True
+        return False
+
 
     def set_pos(self, x, y):
         x = int(x)
@@ -86,7 +97,6 @@ class Piece:
         for index in range(len(self._pos)):
             self._pos[index][0] = self._pos[index][0] + x 
             self._pos[index][1] = self._pos[index][1] + y 
-
     def rotate(self):
         self.update_plan()
         self.positions = [
